@@ -232,7 +232,8 @@ tbody td { padding: 9px 12px; white-space: nowrap; overflow: hidden; text-overfl
         <option>Agosto</option><option>Septiembre</option><option>Octubre</option>
         <option>Noviembre</option><option>Diciembre</option>
       </select>
-      <button class="btn btn-primary" id="btnNuevaTarea" onclick="abrirModal()" style="display:none">+ Nueva tarea</button>
+      <button class="btn" id="btnAgregarVenc" onclick="abrirModalVenc()" style="display:inline-flex">+ Agregar tarea</button>
+      <button class="btn btn-primary" id="btnNuevaTarea" onclick="abrirModal(null)" style="display:none">+ Nueva tarea</button>
     </div>
   </div>
 
@@ -319,6 +320,59 @@ tbody td { padding: 9px 12px; white-space: nowrap; overflow: hidden; text-overfl
 
   </div>
 </main>
+</div>
+
+<!-- MODAL TAREA VENCIMIENTO PERSONALIZADA -->
+<div class="modal-overlay" id="modalVencOverlay">
+  <div class="modal">
+    <div class="modal-title">Agregar tarea al mes</div>
+    <div class="form-row">
+      <label class="form-label">Cliente / Descripción *</label>
+      <input class="form-input" id="vfCliente" placeholder="Ej: Maddoni Juan — Certificado MIPYME">
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Tipo / Impuesto</label>
+        <input class="form-input" id="vfImpuesto" placeholder="Ej: MIPYME, Sueldo, DDJJ...">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Jurisdicción</label>
+        <select class="form-select" id="vfJurisd">
+          <option value="—">—</option>
+          <option>AGIP</option><option>Convenio</option><option>ARBA</option><option>AFIP</option><option>Otro</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Mes donde aparece</label>
+        <select class="form-select" id="vfMes">
+          <option>Mayo</option><option>Junio</option><option>Julio</option><option>Agosto</option>
+          <option>Septiembre</option><option>Octubre</option><option>Noviembre</option><option>Diciembre</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Responsable</label>
+        <select class="form-select" id="vfResp">
+          <option>Mahsen</option><option>Nabil</option><option>Emme</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Fecha de vencimiento *</label>
+        <input class="form-input" type="date" id="vfVto">
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Fecha para hacer (tentativa)</label>
+        <input class="form-input" type="date" id="vfTent">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cerrarModalVenc()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarTareaVenc()">Agregar al mes</button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL NUEVA TAREA -->
@@ -543,7 +597,16 @@ function genTareas(mesNombre) {
     if(gan&&m===6) add("Ganancias PH",GAN_VTO[dv]||"16/06/2026");
     if(antGan&&ANTICIPOS[m]) add(ANT_LABELS[m],anticV(m,dv));
   });
+  // Add extra custom tasks for this month
+  tareasVencExtra.filter(t=>t.mes===mesNombre).forEach(t=>{
+    tareas.push({...t, key:t.id});
+  });
   tareas.sort((a,b)=>parseDMY(a.vto)-parseDMY(b.vto)||a.imp.localeCompare(b.imp));
+  // Apply editable overrides
+  tareas.forEach(t=>{
+    if(editTent[t.key]) t.tent=editTent[t.key];
+    if(editResp[t.key]) t.resp=editResp[t.key];
+  });
   return tareas;
 }
 
@@ -551,6 +614,65 @@ function genTareas(mesNombre) {
 const doneState={}, mailState={};
 let tareasDinamicas = JSON.parse(localStorage.getItem('cmg_tareas')||'[]');
 function saveTareas(){localStorage.setItem('cmg_tareas',JSON.stringify(tareasDinamicas));}
+
+// Tareas personalizadas de vencimientos
+let tareasVencExtra = JSON.parse(localStorage.getItem('cmg_venc_extra')||'[]');
+function saveTareasVencExtra(){localStorage.setItem('cmg_venc_extra',JSON.stringify(tareasVencExtra));}
+
+// Estado editable: fecha tentativa y responsable por tarea
+let editTent = JSON.parse(localStorage.getItem('cmg_tent')||'{}');
+let editResp = JSON.parse(localStorage.getItem('cmg_resp')||'{}');
+function saveEditTent(){localStorage.setItem('cmg_tent',JSON.stringify(editTent));}
+function saveEditResp(){localStorage.setItem('cmg_resp',JSON.stringify(editResp));}
+
+function abrirModalVenc(){
+  const mes=document.getElementById('mesSelect').value;
+  document.getElementById('vfMes').value=mes;
+  // default vto = today + 30 days
+  const d=new Date(); d.setDate(d.getDate()+30);
+  document.getElementById('vfVto').value=d.toISOString().slice(0,10);
+  const t=new Date(d); t.setDate(t.getDate()-3);
+  document.getElementById('vfTent').value=t.toISOString().slice(0,10);
+  document.getElementById('modalVencOverlay').classList.add('open');
+  document.getElementById('vfCliente').focus();
+}
+function cerrarModalVenc(){document.getElementById('modalVencOverlay').classList.remove('open');}
+function guardarTareaVenc(){
+  const cliente=document.getElementById('vfCliente').value.trim();
+  const vtoVal=document.getElementById('vfVto').value;
+  if(!cliente||!vtoVal){alert('Cliente y fecha de vencimiento son obligatorios');return;}
+  const vto=vtoVal.split('-').reverse().join('/');
+  const tentVal=document.getElementById('vfTent').value;
+  const tent=tentVal?tentVal.split('-').reverse().join('/'):addDays(vto,-3);
+  const tarea={
+    id:'extra_'+Date.now(),
+    mes:document.getElementById('vfMes').value,
+    nombre:cliente,
+    imp:document.getElementById('vfImpuesto').value||'Tarea personalizada',
+    jur:document.getElementById('vfJurisd').value,
+    resp:document.getElementById('vfResp').value,
+    vto, tent,
+    cuit:'—', dv:0, tipo:'—'
+  };
+  tareasVencExtra.push(tarea);
+  saveTareasVencExtra();
+  cerrarModalVenc();
+  renderVencimientos();
+}
+function eliminarTareaExtra(id){
+  if(confirm('¿Eliminás esta tarea?')){
+    tareasVencExtra=tareasVencExtra.filter(t=>t.id!==id);
+    saveTareasVencExtra();
+    renderVencimientos();
+  }
+}
+function updateTent(key,val){
+  if(val){const[y,m,d]=val.split('-');editTent[key]=`${d}/${m}/${y}`;}
+  else delete editTent[key];
+  saveEditTent();
+}
+function updateResp(key,val){editResp[key]=val;saveEditResp();}
+
 
 // ─── SECCIONES ────────────────────────────────────────────────────────────────
 let impChartInst=null, anualChartInst=null;
@@ -684,16 +806,23 @@ function renderTablaVenc(){
     const done=doneState[t.key]; const mailed=mailState[t.key];
     const diasVto=diffDaysDMY(t.vto);
     const vtoColor=done?'var(--text3)':diasVto<0?'var(--red)':diasVto<=3?'var(--yellow)':'var(--text)';
-    const tentColor=done?'var(--text3)':'var(--text2)';
+    // Convert DMY to YYYY-MM-DD for date input
+    const [td,tm,ty]=t.tent.split('/');
+    const tentISO=`${ty}-${tm}-${td}`;
+    const isExtra=t.key&&t.key.startsWith('extra_');
     return `<tr class="${done?'done-row':''}">
       <td title="Marcar como hecho"><button class="chk${done?' done':''}" onclick="toggleV('${t.key}','done')">${done?'✓':''}</button></td>
       <td title="Mail enviado"><button class="chk${mailed?' mailed':''}" onclick="toggleV('${t.key}','mail')">${mailed?'✓':''}</button></td>
-      <td title="${t.nombre}">${t.nombre}</td>
-      <td style="font-size:11px">${t.imp}</td>
-      <td style="font-family:'DM Mono',monospace;font-size:12px;color:${tentColor}">${fmtDMY(t.tent)}</td>
+      <td title="${t.nombre}" style="font-size:12px">${t.nombre}${isExtra?` <button class="tarea-del" onclick="eliminarTareaExtra('${t.key}')" title="Eliminar" style="font-size:10px;padding:1px 4px">✕</button>`:''}</td>
+      <td style="font-size:11px;color:var(--text2)">${t.imp}</td>
+      <td><input type="date" value="${tentISO}" onchange="updateTent('${t.key}',this.value)" style="background:transparent;border:none;border-bottom:1px solid var(--border2);color:var(--accent);font-size:11px;font-family:'DM Mono',monospace;width:100px;cursor:pointer;padding:2px" title="Clic para cambiar fecha"></td>
       <td style="font-weight:500;font-family:'DM Mono',monospace;font-size:12px;color:${vtoColor}">${fmtDMY(t.vto)}</td>
       <td>${jurisdBadge(t.jur)}</td>
-      <td class="${respClass(t.resp)}">${t.resp}</td>
+      <td><select onchange="updateResp('${t.key}',this.value)" style="background:var(--bg3);border:1px solid var(--border);color:${t.resp==='Mahsen'?'#4f7ef8':t.resp==='Nabil'?'#22c55e':'#f59e0b'};font-size:11px;border-radius:4px;padding:2px 4px;font-family:'DM Sans',sans-serif;font-weight:500">
+        <option ${t.resp==='Mahsen'?'selected':''}>Mahsen</option>
+        <option ${t.resp==='Nabil'?'selected':''}>Nabil</option>
+        <option ${t.resp==='Emme'?'selected':''}>Emme</option>
+      </select></td>
       <td>${bMap[est]}</td>
     </tr>`;
   }).join('');
@@ -933,6 +1062,7 @@ const hoyMes=TODAY.getMonth()+1;
 const mesIdx=mesActual.findIndex(m=>{const n=MESES_N[m];return hoyMes<=n;});
 if(mesIdx>=0) document.getElementById('mesSelect').value=mesActual[mesIdx];
 document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))cerrarModal();});
+document.getElementById('modalVencOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalVencOverlay'))cerrarModalVenc();});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarModal();});
 renderVencimientos();
 </script>
