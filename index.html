@@ -233,7 +233,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; overflow: hidden; text-overfl
         <option>Noviembre</option><option>Diciembre</option>
       </select>
       <button class="btn" id="btnAgregarVenc" onclick="abrirModalVenc()" style="display:inline-flex">+ Agregar tarea</button>
-      <button class="btn btn-primary" id="btnNuevaTarea" onclick="abrirModal(null)" style="display:none">+ Nueva tarea</button>
+      <button class="btn btn-primary" id="btnNuevaTarea" onclick="abrirModal(null)" style="display:none">+ Nueva nota</button>
     </div>
   </div>
 
@@ -490,8 +490,8 @@ const CL=[
 ["Ricardo Lazzati",20134361930,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["Mariam Abdala",27355173971,1,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["Daniel Al Jatib",20340564635,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["HELENA BARISCHPOLSKI",27108238351,1,"RI",0,1,"Convenio",1,1,1,1,"Mahsen"],
-["NORBERTO SAVINO",20076424617,7,"RI",0,1,"---",1,1,1,1,"Mahsen"],
+["HELENA BARISCHPOLSKI",27108238351,1,"RI",0,1,"Convenio",1,1,1,1,1,"Mahsen"],
+["NORBERTO SAVINO",20076424617,7,"RI",0,1,"---",1,1,1,1,1,"Mahsen"],
 ["Magali Camarda",27394333102,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["Nicolas Sanchez",20331044602,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["Martin Kelly",20328486262,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
@@ -501,7 +501,7 @@ const CL=[
 ["TOLEDO MARIA JOSE",27370495942,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["Maia Ale",27350764513,3,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
 ["Federico M. Zayoud",20351600293,3,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["Benjamin Klahman",20266225343,3,"Mono",1,0,"AGIP",0,0,0,1,"Nabil"],
+["Benjamin Klahman",20266225343,3,"Mono",1,0,"AGIP",0,0,0,1,1,"Nabil"],
 ["Ignacio Cativa",20362731403,3,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
 ["Luciano Staffora",20366850903,3,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["Ignacio A. Depaoli",23347444359,9,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
@@ -526,7 +526,7 @@ const CL=[
 ["Jorge Oscar Adad",20207601048,8,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
 ["J.E. CORTEZ SCHUMACHER",20345377078,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["SIMON MARTINEZ MOLINA",20958813938,8,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Edinson Apolinar Tirado",20957102868,8,"Mono",1,0,"AGIP",0,0,0,1,"Nabil"],
+["Edinson Apolinar Tirado",20957102868,8,"Mono",1,0,"AGIP",0,0,0,1,1,"Nabil"],
 ["DIAZ LEON YOLIMAR",27191418374,4,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
 ["Milton G. Cardoso",23342118119,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["Luciano Mahmond",20353677609,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
@@ -534,11 +534,11 @@ const CL=[
 ["Lucila Grossman",27373402619,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
 ["Viviana E. Luif",27176050689,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
 ["Sandra Leiva",27247469007,7,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["martin abas (Tethim)",20322160950,0,"SRL",0,1,"Convenio",1,1,1,1,"Emme"],
+["martin abas (Tethim)",20322160950,0,"SRL",0,1,"Convenio",1,1,1,1,1,"Emme"],
 ["Francisco Calvo (JFC)",20364044349,9,"SS",1,1,"Convenio",1,1,1,0,"Emme"],
-["Transporte Bellini SRL",20338603100,0,"SRL",0,1,"ARBA",1,1,1,1,"Emme"],
+["Transporte Bellini SRL",20338603100,0,"SRL",0,1,"ARBA",1,1,1,1,1,"Emme"],
 ["Amelia Maria Celiz",27109220189,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Daniel Zavaleta Ceclen",20944176226,6,"RI",0,1,"AGIP",1,1,1,1,"Emme"],
+["Daniel Zavaleta Ceclen",20944176226,6,"RI",0,1,"AGIP",1,1,1,1,1,"Emme"],
 ["Gerline Ladera D.L.R.",27190902787,7,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
 ["VICTORIA BELLANTI",27406399910,0,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
 ["Francisco Colombato",20386181307,7,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
@@ -579,7 +579,7 @@ const GAN_VTO={0:"11/06/2026",1:"11/06/2026",2:"12/06/2026",3:"12/06/2026",4:"16
 function genTareas(mesNombre) {
   const m=MESES_N[mesNombre]; const tareas=[];
   CL.forEach(cl=>{
-    const[nombre,cuit,dv,tipo,mono,auto,iibb,iva,gan,antGan,f931,resp]=cl;
+    const[nombre,cuit,dv,tipo,mono,auto,iibb,iva,gan,antGan,rrhh,f931,resp]=cl;
     const cl_last=+String(cuit).slice(-1);
     function add(imp,vto,jur){
       const key=`${mesNombre}|${imp}|${cuit}`;
@@ -597,6 +597,20 @@ function genTareas(mesNombre) {
     if(gan&&m===6) add("Ganancias PH",GAN_VTO[dv]||"16/06/2026");
     if(antGan&&ANTICIPOS[m]) add(ANT_LABELS[m],anticV(m,dv));
   });
+  // Liquidacion de sueldos - last day of month
+  const ULTIMO_DIA={Mayo:"31/05/2026",Junio:"30/06/2026",Julio:"31/07/2026",Agosto:"31/08/2026",
+    Septiembre:"30/09/2026",Octubre:"31/10/2026",Noviembre:"30/11/2026",Diciembre:"31/12/2026"};
+  if(ULTIMO_DIA[mesNombre]){
+    CL.forEach(cl=>{
+      const[nombre,cuit,dv,tipo,mono,auto,iibb,iva,gan,antGan,rrhh,f931,resp]=cl;
+      if(rrhh){
+        const vto=ULTIMO_DIA[mesNombre];
+        const key=`${mesNombre}|LiqSueldos|${cuit}`;
+        tareas.push({imp:"Liquidación de Sueldos",nombre,cuit:String(cuit),dv,tipo,jur:"—",vto,tent:tentativa(vto),resp,key});
+      }
+    });
+  }
+
   // Add extra custom tasks for this month
   tareasVencExtra.filter(t=>t.mes===mesNombre).forEach(t=>{
     tareas.push({...t, key:t.id});
@@ -844,49 +858,36 @@ function toggleV(key,type){
 // ─── MODAL TAREA ─────────────────────────────────────────────────────────────
 let editIdx=null;
 function abrirModal(idx=null){
-  editIdx=idx;
-  const m=document.getElementById;
-  if(idx!==null){
-    const t=tareasDinamicas[idx];
-    m('modalTitle').textContent='Editar tarea';
-    m('fTitulo').value=t.titulo;
-    m('fDesc').value=t.desc||'';
-    m('fCliente').value=t.cliente||'';
-    m('fCat').value=t.cat;
-    m('fPrio').value=t.prio;
-    m('fResp2').value=t.resp;
-    m('fFecha').value=t.fecha||'';
-    m('fRecordatorio').value=t.recordatorio||'';
-  } else {
-    m('modalTitle').textContent='Nueva tarea';
-    m('fTitulo').value='';m('fDesc').value='';m('fCliente').value='';
-    m('fCat').value='Facturación';m('fPrio').value='Media';m('fResp2').value='Mahsen';
-    m('fFecha').value='';m('fRecordatorio').value='';
-  }
+  editIdx=null;
+  document.getElementById('fTitulo').value='';
+  document.getElementById('fCat').value='Facturación';
+  document.getElementById('fResp2').value='Mahsen';
+  document.getElementById('fFecha').value='';
+  document.getElementById('colorYellow').checked=true;
   document.getElementById('modalOverlay').classList.add('open');
-  document.getElementById('fTitulo').focus();
+  setTimeout(()=>document.getElementById('fTitulo').focus(),100);
 }
 function cerrarModal(){document.getElementById('modalOverlay').classList.remove('open');}
-function guardarTarea(){
+function guardarNota(){
   const titulo=document.getElementById('fTitulo').value.trim();
-  if(!titulo){alert('El título es obligatorio');return;}
+  if(!titulo){alert('Escribí algo primero');return;}
+  const color=document.querySelector('input[name="fColor"]:checked')?.value||'yellow';
   const t={
-    id:editIdx!==null?tareasDinamicas[editIdx].id:Date.now(),
-    titulo, desc:document.getElementById('fDesc').value,
-    cliente:document.getElementById('fCliente').value,
+    id:Date.now(),
+    titulo,
+    color,
     cat:document.getElementById('fCat').value,
-    prio:document.getElementById('fPrio').value,
     resp:document.getElementById('fResp2').value,
     fecha:document.getElementById('fFecha').value,
-    recordatorio:document.getElementById('fRecordatorio').value,
-    creadaEn:editIdx!==null?tareasDinamicas[editIdx].creadaEn:new Date().toISOString(),
+    creadaEn:new Date().toISOString(),
     ultimaMod:new Date().toISOString(),
-    cerrada:editIdx!==null?tareasDinamicas[editIdx].cerrada:false,
+    cerrada:false,
+    cerradaEn:null,
   };
-  if(editIdx!==null) tareasDinamicas[editIdx]=t;
-  else tareasDinamicas.unshift(t);
+  tareasDinamicas.unshift(t);
   saveTareas(); cerrarModal(); renderTareas();
 }
+function guardarTarea(){guardarNota();}
 
 // ─── TAREAS ───────────────────────────────────────────────────────────────────
 function getEstadoT(t){
@@ -907,8 +908,9 @@ function renderTareas(){
     if(fE&&getEstadoT(t)!==fE) return false;
     return true;
   });
-  const total=tareasDinamicas.length;
-  const abiertas=tareasDinamicas.filter(t=>!t.cerrada).length;
+  const total=tareasDinamicas.filter(t=>!t.cerrada).length;
+  const abiertas=total;
+  const rojas=tareasDinamicas.filter(t=>!t.cerrada&&t.color==='red').length;
   const venc=tareasDinamicas.filter(t=>!t.cerrada&&t.fecha&&diffDays(t.fecha)<0).length;
   const urg=tareasDinamicas.filter(t=>!t.cerrada&&t.fecha&&diffDays(t.fecha)>=0&&diffDays(t.fecha)<=3).length;
   const diasInactivo=7;
@@ -919,49 +921,63 @@ function renderTareas(){
   }).length;
 
   document.getElementById('kpiTareas').innerHTML=`
-    <div class="kpi-card c-blue"><div class="kpi-label">Total tareas</div><div class="kpi-val">${total}</div></div>
-    <div class="kpi-card"><div class="kpi-label">Abiertas</div><div class="kpi-val" style="color:var(--text)">${abiertas}</div></div>
-    <div class="kpi-card ${venc>0?'c-red':''}"><div class="kpi-label">Vencidas</div><div class="kpi-val">${venc}</div></div>
-    <div class="kpi-card ${urg>0?'c-yellow':''}"><div class="kpi-label">Urgentes</div><div class="kpi-val">${urg}</div></div>
+    <div class="kpi-card c-blue"><div class="kpi-label">Notas abiertas</div><div class="kpi-val">${total}</div></div>
+    <div class="kpi-card c-red"><div class="kpi-label">🔴 Urgentes</div><div class="kpi-val">${rojas}</div></div>
+    <div class="kpi-card ${venc>0?'c-red':''}"><div class="kpi-label">Fecha vencida</div><div class="kpi-val">${venc}</div></div>
+    <div class="kpi-card ${urg>0?'c-yellow':''}"><div class="kpi-label">⚠ Por vencer</div><div class="kpi-val">${urg}</div></div>
     <div class="kpi-card ${estancadas>0?'c-yellow':''}"><div class="kpi-label">Sin mover +7d</div><div class="kpi-val">${estancadas}</div></div>
   `;
 
   let aHtml='';
-  if(venc>0) aHtml+=`<div class="alerta red"><div class="alerta-dot"></div><strong>${venc} tarea${venc>1?'s':''} vencida${venc>1?'s':''}</strong> — fecha crítica superada</div>`;
-  if(urg>0) aHtml+=`<div class="alerta yellow"><div class="alerta-dot"></div><strong>${urg} tarea${urg>1?'s':''} urgente${urg>1?'s':''}</strong> — fecha crítica en ≤ 3 días</div>`;
-  if(estancadas>0) aHtml+=`<div class="alerta blue"><div class="alerta-dot"></div><strong>${estancadas} tarea${estancadas>1?'s':''} sin movimiento</strong> — más de ${diasInactivo} días sin actualizar</div>`;
-  if(!aHtml&&abiertas===0) aHtml=`<div class="alerta green"><div class="alerta-dot"></div>No hay tareas abiertas. ¡Todo cerrado!</div>`;
+  if(rojas>0) aHtml+=`<div class="alerta red"><div class="alerta-dot"></div><strong>${rojas} nota${rojas>1?'s':''} urgente${rojas>1?'s':''}</strong> — marcadas en rojo, atención inmediata</div>`;
+  if(venc>0) aHtml+=`<div class="alerta red"><div class="alerta-dot"></div><strong>${venc} nota${venc>1?'s':''} con fecha vencida</strong></div>`;
+  if(urg>0) aHtml+=`<div class="alerta yellow"><div class="alerta-dot"></div><strong>${urg} nota${urg>1?'s':''} por vencer</strong> — fecha crítica en ≤ 3 días</div>`;
+  if(estancadas>0) aHtml+=`<div class="alerta blue"><div class="alerta-dot"></div><strong>${estancadas} nota${estancadas>1?'s':''} sin movimiento</strong> — más de ${diasInactivo} días sin tocar</div>`;
+  if(!aHtml&&total===0) aHtml=`<div class="alerta green"><div class="alerta-dot"></div>No hay notas abiertas. Usá "+ Nueva nota" para agregar.</div>`;
   document.getElementById('alertasTareas').innerHTML=aHtml;
   document.getElementById('tareasCount').textContent=`${filtered.length} tareas`;
 
-  const prioColors={Alta:'var(--red)',Media:'var(--yellow)',Baja:'var(--text3)'};
+  const semaforoColor={red:'#ef4444',yellow:'#f59e0b',green:'#22c55e'};
+  const semaforoLabel={red:'Urgente',yellow:'Medio',green:'Sin urgencia'};
   const estColors={vencida:'vencida-card',urgente:'urgente-card',cerrada:'done-card',abierta:''};
-  const bEstado={cerrada:'<span class="badge b-hecho">Cerrada</span>',vencida:'<span class="badge b-vencido">Vencida</span>',urgente:'<span class="badge b-urgente">Urgente</span>',abierta:'<span class="badge b-pendiente">Abierta</span>'};
-  
+  const bEstado={cerrada:'<span class="badge b-hecho">✓ Hecha</span>',vencida:'<span class="badge b-vencido">Vencida</span>',urgente:'<span class="badge b-urgente">Urgente</span>',abierta:'<span class="badge b-pendiente">Abierta</span>'};
+
+  // Auto-eliminate tasks done for more than 3 days
+  const now=Date.now();
+  tareasDinamicas=tareasDinamicas.filter(t=>{
+    if(!t.cerrada||!t.cerradaEn) return true;
+    const diasCerrada=(now-new Date(t.cerradaEn))/86400000;
+    return diasCerrada<3;
+  });
+  saveTareas();
+
   document.getElementById('tareasGrid').innerHTML=filtered.length===0
-    ?`<div style="text-align:center;padding:40px;color:var(--text3)">No hay tareas con los filtros seleccionados</div>`
-    :filtered.map((t,i)=>{
+    ?`<div style="text-align:center;padding:60px;color:var(--text3);font-size:13px">No hay notas. Usá "+ Nueva nota" para agregar.</div>`
+    :filtered.map((t)=>{
       const idx=tareasDinamicas.indexOf(t);
       const est=getEstadoT(t);
       const diasCreada=Math.round((Date.now()-new Date(t.creadaEn))/86400000);
-      const fechaLabel=t.fecha?`<span style="font-family:'DM Mono',monospace;font-size:11px;color:${est==='vencida'?'var(--red)':est==='urgente'?'var(--yellow)':'var(--text3)'}">${t.fecha}</span>`:'';
-      return `<div class="tarea-card ${estColors[est]||''}">
-        <button class="chk${t.cerrada?' done':''}" onclick="toggleTarea(${idx})" title="Cerrar tarea">${t.cerrada?'✓':''}</button>
+      const color=semaforoColor[t.color||'yellow'];
+      const fechaLabel=t.fecha?`<span style="font-family:'DM Mono',monospace;font-size:11px;color:${est==='vencida'?'var(--red)':est==='urgente'?'var(--yellow)':'var(--text3)'}">📅 ${t.fecha}</span>`:'';
+      return `<div class="tarea-card ${estColors[est]||''}" style="border-left:3px solid ${color}">
+        <button class="chk${t.cerrada?' done':''}" onclick="toggleTarea(${idx})" title="${t.cerrada?'Desmarcar':'Marcar como hecho'}">${t.cerrada?'✓':''}</button>
         <div class="tarea-body">
-          <div class="tarea-titulo">${t.titulo}</div>
-          ${t.desc?`<div class="tarea-desc">${t.desc}</div>`:''}
-          <div class="tarea-meta">
+          <div class="tarea-titulo" style="${t.cerrada?'text-decoration:line-through;opacity:.5':''}">${t.titulo}</div>
+          <div class="tarea-meta" style="margin-top:5px">
+            <span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:${color}">
+              <span style="width:8px;height:8px;border-radius:50%;background:${color};display:inline-block"></span>
+              ${semaforoLabel[t.color||'yellow']}
+            </span>
             <span class="badge b-cat">${t.cat}</span>
-            <span class="badge" style="background:transparent;color:${prioColors[t.prio]};font-size:11px">● ${t.prio}</span>
-            <span class="badge b-pendiente ${respClass(t.resp)}">${t.resp}</span>
-            ${t.cliente?`<span style="font-size:11px;color:var(--text3)">${t.cliente}</span>`:''}
+            <span class="${respClass(t.resp)}" style="font-size:11px;font-weight:500">${t.resp}</span>
             ${fechaLabel}
             ${bEstado[est]}
             <span style="font-size:11px;color:var(--text3)">Hace ${diasCreada}d</span>
+            ${t.cerrada?'<span style="font-size:11px;color:var(--green)">— Se elimina en 3 días</span>':''}
           </div>
         </div>
         <div class="tarea-actions">
-          <button class="tarea-del" onclick="abrirModal(${idx})" title="Editar">✎</button>
+          <button class="tarea-del" onclick="cambiarColor(${idx})" title="Cambiar urgencia" style="font-size:14px">●</button>
           <button class="tarea-del" onclick="eliminarTarea(${idx})" title="Eliminar">✕</button>
         </div>
       </div>`;
@@ -971,6 +987,14 @@ function renderTareas(){
 function toggleTarea(idx){
   tareasDinamicas[idx].cerrada=!tareasDinamicas[idx].cerrada;
   tareasDinamicas[idx].ultimaMod=new Date().toISOString();
+  tareasDinamicas[idx].cerradaEn=tareasDinamicas[idx].cerrada?new Date().toISOString():null;
+  saveTareas(); renderTareas();
+}
+function cambiarColor(idx){
+  const order=['yellow','red','green'];
+  const cur=tareasDinamicas[idx].color||'yellow';
+  const next=order[(order.indexOf(cur)+1)%order.length];
+  tareasDinamicas[idx].color=next;
   saveTareas(); renderTareas();
 }
 function eliminarTarea(idx){
