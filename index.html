@@ -1,3 +1,4 @@
+<!-- CMG v6.1 -->
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -204,15 +205,15 @@ tbody td { padding: 9px 12px; white-space: nowrap; overflow: hidden; text-overfl
     <div class="logo-sub">Sistema de Gestión</div>
   </div>
   <nav class="sidebar-nav">
-    <div class="nav-item active" onclick="showSection('vencimientos')">
+    <div class="nav-item active" onclick="showSection('vencimientos',this)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="13" rx="2"/><path d="M1 6h14M5 1v2M11 1v2"/></svg>
       <span>Vencimientos</span>
     </div>
-    <div class="nav-item" onclick="showSection('tareas')">
+    <div class="nav-item" onclick="showSection('tareas',this)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
       <span>Tareas</span>
     </div>
-    <div class="nav-item" onclick="showSection('control')">
+    <div class="nav-item" onclick="showSection('control',this)">
       <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12 L5 8 L8 10 L11 5 L14 7"/><circle cx="14" cy="7" r="1" fill="currentColor"/></svg>
       <span>Control</span>
     </div>
@@ -227,7 +228,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; overflow: hidden; text-overfl
   <div class="topbar">
     <div class="topbar-title" id="topbarTitle">Vencimientos</div>
     <div class="topbar-right">
-      <select class="mes-select" id="mesSelect" onchange="renderVencimientos()">
+      <select class="mes-select" id="mesSelect" onchange="document.getElementById('fImp').value='';document.getElementById('fResp').value='';document.getElementById('fEst').value='';renderVencimientos()">
         <option>Mayo</option><option>Junio</option><option>Julio</option>
         <option>Agosto</option><option>Septiembre</option><option>Octubre</option>
         <option>Noviembre</option><option>Diciembre</option>
@@ -471,88 +472,88 @@ function jurisdBadge(j) {
 // ─── DATOS CLIENTES (compacto) ────────────────────────────────────────────────
 // [nombre, cuit, dv, tipo, mono, auto, iibb, iva, gan, antGan, f931, resp]
 const CL=[
-["Cesar Lamas",20359800410,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Cecilia Lamas",27235983015,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Juan Gelay",20350953680,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Mariam El Cheij",27393385710,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Jesus S. Andrada",20370292850,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["SILVIO OMAR PAIVA",20375841046,6,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Cesar Daniel Barreto",20467290593,3,"Mono",1,0,"Convenio",0,0,0,0,"Emme"],
-["Camilo Al Cheij",20376049486,6,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
-["SANDRA MAFUD",27181403743,3,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Paula San Miguel",27340957178,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Federico Farfaglia",20360878350,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Daniela Albornoz",27218455528,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["APPOLLONI JUAN IGNACIO",20322679530,0,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["APPOLLONI MILAGROS",27407320102,2,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["Juan Pablo Appolloni",23352020419,9,"RI",0,1,"AGIP",1,1,1,0,"Emme"],
-["Paola Virginia Romano",27217957430,0,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["Ricardo Lazzati",20134361930,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Mariam Abdala",27355173971,1,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Daniel Al Jatib",20340564635,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Cesar Lamas",20359800410,0,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Cecilia Lamas",27235983015,5,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Juan Gelay",20350953680,0,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Mariam El Cheij",27393385710,0,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Jesus S. Andrada",20370292850,0,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["SILVIO OMAR PAIVA",20375841046,6,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Cesar Daniel Barreto",20467290593,3,"Mono",1,0,"Convenio",0,0,0,0,0,"Emme"],
+["Camilo Al Cheij",20376049486,6,"RI",0,1,"Convenio",1,1,1,0,0,"Emme"],
+["SANDRA MAFUD",27181403743,3,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Paula San Miguel",27340957178,8,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Federico Farfaglia",20360878350,0,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Daniela Albornoz",27218455528,8,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["APPOLLONI JUAN IGNACIO",20322679530,0,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["APPOLLONI MILAGROS",27407320102,2,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["Juan Pablo Appolloni",23352020419,9,"RI",0,1,"AGIP",1,1,1,0,0,"Emme"],
+["Paola Virginia Romano",27217957430,0,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["Ricardo Lazzati",20134361930,0,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Mariam Abdala",27355173971,1,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Daniel Al Jatib",20340564635,5,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
 ["HELENA BARISCHPOLSKI",27108238351,1,"RI",0,1,"Convenio",1,1,1,1,1,"Mahsen"],
 ["NORBERTO SAVINO",20076424617,7,"RI",0,1,"---",1,1,1,1,1,"Mahsen"],
-["Magali Camarda",27394333102,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Nicolas Sanchez",20331044602,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Martin Kelly",20328486262,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["RAUL DELLUTRI",20264726582,2,"Mono",1,0,"ARBA",0,0,0,0,"Mahsen"],
-["Carnevale Inti Nahuel",20326365549,9,"Mono",1,0,"ARBA",0,0,0,0,"Mahsen"],
-["MADDONI JUAN MANUEL",20252274902,2,"RI",0,1,"AGIP",1,1,1,0,"Mahsen"],
-["TOLEDO MARIA JOSE",27370495942,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Maia Ale",27350764513,3,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Federico M. Zayoud",20351600293,3,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Magali Camarda",27394333102,2,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Nicolas Sanchez",20331044602,2,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Martin Kelly",20328486262,2,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["RAUL DELLUTRI",20264726582,2,"Mono",1,0,"ARBA",0,0,0,0,0,"Mahsen"],
+["Carnevale Inti Nahuel",20326365549,9,"Mono",1,0,"ARBA",0,0,0,0,0,"Mahsen"],
+["MADDONI JUAN MANUEL",20252274902,2,"RI",0,1,"AGIP",1,1,1,0,0,"Mahsen"],
+["TOLEDO MARIA JOSE",27370495942,2,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Maia Ale",27350764513,3,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
+["Federico M. Zayoud",20351600293,3,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
 ["Benjamin Klahman",20266225343,3,"Mono",1,0,"AGIP",0,0,0,1,1,"Nabil"],
-["Ignacio Cativa",20362731403,3,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
-["Luciano Staffora",20366850903,3,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Ignacio A. Depaoli",23347444359,9,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["Vilma Garcia",27123781274,4,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["M.M. GONZALEZ VANEZCA",27958533484,4,"RI",0,1,"AGIP",1,1,1,0,"Emme"],
-["Paula Tapella",23165582594,4,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
-["Alejandra Tapella",27149524768,8,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
-["Fernando Rastrilla",20315180504,4,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Lucia Serres Zelada",27190751568,8,"Mono",1,0,"San Luis",0,0,0,0,"Mahsen"],
-["Veronica Ramondegui",27373451814,4,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Gustavo Jaurena",20145753245,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Maria Marta Zuliani",27222971115,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Jose Caceres",20258752865,2,"SS",0,1,"AGIP",1,1,1,0,"Emme"],
-["Rocio Pizza",27450424205,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Soledad Sanchez",27292188566,6,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Hernan Sosa",20268875485,5,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["SANCHEZ FACUNDO",20266889586,6,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["PIERINI MARIA LAURA",27147844986,6,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Daniel Treife",20268526367,7,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Andres Valerio Rojas",20957090347,7,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["Sebastian Zayoud",20281540468,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Jorge Oscar Adad",20207601048,8,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["J.E. CORTEZ SCHUMACHER",20345377078,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["SIMON MARTINEZ MOLINA",20958813938,8,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Ignacio Cativa",20362731403,3,"RI",0,1,"Convenio",1,1,1,0,0,"Emme"],
+["Luciano Staffora",20366850903,3,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Ignacio A. Depaoli",23347444359,9,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["Vilma Garcia",27123781274,4,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["M.M. GONZALEZ VANEZCA",27958533484,4,"RI",0,1,"AGIP",1,1,1,0,0,"Emme"],
+["Paula Tapella",23165582594,4,"RI",0,1,"Convenio",1,1,1,0,0,"Emme"],
+["Alejandra Tapella",27149524768,8,"RI",0,1,"Convenio",1,1,1,0,0,"Emme"],
+["Fernando Rastrilla",20315180504,4,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Lucia Serres Zelada",27190751568,8,"Mono",1,0,"San Luis",0,0,0,0,0,"Mahsen"],
+["Veronica Ramondegui",27373451814,4,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Gustavo Jaurena",20145753245,5,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Maria Marta Zuliani",27222971115,5,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Jose Caceres",20258752865,2,"SS",0,1,"AGIP",1,1,1,0,0,"Emme"],
+["Rocio Pizza",27450424205,5,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Soledad Sanchez",27292188566,6,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
+["Hernan Sosa",20268875485,5,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
+["SANCHEZ FACUNDO",20266889586,6,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["PIERINI MARIA LAURA",27147844986,6,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
+["Daniel Treife",20268526367,7,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Andres Valerio Rojas",20957090347,7,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["Sebastian Zayoud",20281540468,8,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Jorge Oscar Adad",20207601048,8,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["J.E. CORTEZ SCHUMACHER",20345377078,8,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["SIMON MARTINEZ MOLINA",20958813938,8,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
 ["Edinson Apolinar Tirado",20957102868,8,"Mono",1,0,"AGIP",0,0,0,1,1,"Nabil"],
-["DIAZ LEON YOLIMAR",27191418374,4,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["Milton G. Cardoso",23342118119,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Luciano Mahmond",20353677609,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Osvaldo Luis Galvan",20184049059,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Lucila Grossman",27373402619,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Viviana E. Luif",27176050689,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Sandra Leiva",27247469007,7,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["DIAZ LEON YOLIMAR",27191418374,4,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["Milton G. Cardoso",23342118119,9,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Luciano Mahmond",20353677609,9,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
+["Osvaldo Luis Galvan",20184049059,9,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Lucila Grossman",27373402619,9,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
+["Viviana E. Luif",27176050689,9,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Sandra Leiva",27247469007,7,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
 ["martin abas (Tethim)",20322160950,0,"SRL",0,1,"Convenio",1,1,1,1,1,"Emme"],
-["Francisco Calvo (JFC)",20364044349,9,"SS",1,1,"Convenio",1,1,1,0,"Emme"],
+["Francisco Calvo (JFC)",20364044349,9,"SS",1,1,"Convenio",1,1,1,0,0,"Emme"],
 ["Transporte Bellini SRL",20338603100,0,"SRL",0,1,"ARBA",1,1,1,1,1,"Emme"],
-["Amelia Maria Celiz",27109220189,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Amelia Maria Celiz",27109220189,9,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
 ["Daniel Zavaleta Ceclen",20944176226,6,"RI",0,1,"AGIP",1,1,1,1,1,"Emme"],
-["Gerline Ladera D.L.R.",27190902787,7,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["VICTORIA BELLANTI",27406399910,0,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["Francisco Colombato",20386181307,7,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["PEREYRA Ignacio",20361533969,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Ines Navarlatz",27334040009,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Ariel A. Martinez",20304941848,8,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
-["Patricia Miranda",27408950622,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Carbajal Agustin",20425885384,4,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Silvina Rios Arredondo",27956327615,5,"Mono",1,0,"Convenio",0,0,0,0,"Nabil"],
-["Jose Chaubaci",20135019438,8,"RI",0,1,"AGIP",1,1,1,0,"Mahsen"],
-["Mahsen Chaubaci",20370390127,7,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
-["Noelia Pace",27369192898,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["Amina Brahem",24383897625,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
-["HASSAN CHABAN",23368679429,9,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Gerline Ladera D.L.R.",27190902787,7,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["VICTORIA BELLANTI",27406399910,0,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["Francisco Colombato",20386181307,7,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["PEREYRA Ignacio",20361533969,9,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Ines Navarlatz",27334040009,9,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
+["Ariel A. Martinez",20304941848,8,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
+["Patricia Miranda",27408950622,2,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Carbajal Agustin",20425885384,4,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Silvina Rios Arredondo",27956327615,5,"Mono",1,0,"Convenio",0,0,0,0,0,"Nabil"],
+["Jose Chaubaci",20135019438,8,"RI",0,1,"AGIP",1,1,1,0,0,"Mahsen"],
+["Mahsen Chaubaci",20370390127,7,"Mono",1,0,"AGIP",0,0,0,0,0,"Nabil"],
+["Noelia Pace",27369192898,8,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["Amina Brahem",24383897625,5,"Mono",1,0,"Convenio",0,0,0,0,0,"Mahsen"],
+["HASSAN CHABAN",23368679429,9,"Mono",1,0,"AGIP",0,0,0,0,0,"Mahsen"],
 ];
 
 const MONO_VTO={5:"20/05/2026",6:"22/06/2026",7:"20/07/2026",8:"20/08/2026",9:"21/09/2026",10:"20/10/2026",11:"20/11/2026",12:"21/12/2026"};
@@ -561,7 +562,7 @@ const AUTO={5:["05/05","06/05","07/05"],6:["05/06","08/06","09/06"],7:["06/07","
 const CONV={5:["15/05","18/05","19/05","20/05"],6:["16/06","17/06","18/06","19/06"],7:["15/07","16/07","17/07","20/07"],8:["14/08","18/08","19/08","20/08"],9:["15/09","16/09","17/09","18/09"],10:["15/10","16/10","19/10","20/10"],11:["13/11","16/11","17/11","18/11"],12:["15/12","16/12","17/12","18/12"]};
 const AGIP={5:["11/05","12/05","13/05","14/05","15/05"],6:["11/06","12/06","16/06","17/06","18/06"],7:["13/07","14/07","15/07","16/07","17/07"],8:["11/08","12/08","13/08","14/08","18/08"],9:["11/09","14/09","15/09","16/09","17/09"],10:["13/10","14/10","15/10","16/10","19/10"],11:["11/11","12/11","13/11","16/11","17/11"],12:["11/12","14/12","15/12","16/12","17/12"]};
 const IVA={5:["18/05","19/05","20/05","21/05","22/05"],6:["18/06","19/06","22/06","23/06","24/06"],7:["20/07","21/07","22/07","23/07","24/07"],8:["18/08","19/08","20/08","21/08","24/08"],9:["18/09","21/09","22/09","23/09","24/09"],10:["19/10","20/10","21/10","22/10","23/10"],11:["18/11","19/11","20/11","23/11","24/11"],12:["18/12","21/12","22/12","23/12","24/12"]};
-const F931={5:["09/06","10/06","11/06"],6:["10/07","13/07","14/07"],7:["10/08","11/08","12/08"],8:["09/09","10/09","11/09"],9:["09/10","12/10","13/10"],10:["09/11","10/11","11/11"],11:["09/12","10/12","11/12"]};
+const F931={4:["11/05","12/05","13/05"],5:["09/06","10/06","11/06"],6:["10/07","13/07","14/07"],7:["10/08","11/08","12/08"],8:["09/09","10/09","11/09"],9:["09/10","12/10","13/10"],10:["09/11","10/11","11/11"],11:["09/12","10/12","11/12"]};
 const ANTICIPOS={6:["11/06","12/06","16/06","17/06","18/06"],8:["11/08","12/08","13/08","16/08","17/08"],10:["13/10","14/10","15/10","16/10","19/10"],12:["11/12","14/12","15/12","16/12","17/12"]};
 const ANT_LABELS={6:"1er Anticipo Ganancias",8:"2do Anticipo Ganancias",10:"3er Anticipo Ganancias",12:"4to Anticipo Ganancias"};
 const MESES_N={Mayo:5,Junio:6,Julio:7,Agosto:8,Septiembre:9,Octubre:10,Noviembre:11,Diciembre:12};
@@ -590,9 +591,9 @@ function genTareas(mesNombre) {
     if(auto&&AUTO[m]) add("Autónomos",autoV(m,dv));
     if(iibb&&iibb!=="---"&&iibb!=="----"){
       const vto=iibb==="AGIP"?agipV(m,dv):convV(m,cl_last);
-      add(`IIBB ${iibb}`,vto,iibb);
+      add("Ingresos Brutos",vto,iibb);
     }
-    if(iva&&IVA[m]) add("IVA",ivaV(m,dv));
+    if(iva&&IVA[m]) add("IVA",ivaV(m,dv),"AFIP");
     if(f931){const v=f931V(m-1,dv);if(v)add("F.931",v);}
     if(gan&&m===6) add("Ganancias PH",GAN_VTO[dv]||"16/06/2026");
     if(antGan&&ANTICIPOS[m]) add(ANT_LABELS[m],anticV(m,dv));
@@ -690,11 +691,11 @@ function updateResp(key,val){editResp[key]=val;saveEditResp();}
 
 // ─── SECCIONES ────────────────────────────────────────────────────────────────
 let impChartInst=null, anualChartInst=null;
-function showSection(id){
+function showSection(id,el){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
-  event.currentTarget.classList.add('active');
+  if(el) el.classList.add('active');
   const titles={vencimientos:'Vencimientos',tareas:'Tareas del estudio',control:'Control y seguimiento'};
   document.getElementById('topbarTitle').textContent=titles[id];
   document.getElementById('mesSelect').style.display=id==='vencimientos'?'':'none';
@@ -749,7 +750,7 @@ function renderVencimientos(){
   document.getElementById('alertasVenc').innerHTML=aHtml;
 
   // Progreso por responsable
-  const resps=['Mahsen','Emme','Nabil','Emme'];
+  const resps=['Mahsen','Nabil','Emme'];
   const colors={Mahsen:'#4f7ef8',Emme:'#a855f7',Nabil:'#22c55e',Emme:'#f59e0b'};
   let pHtml='';
   resps.forEach(r=>{
@@ -767,7 +768,7 @@ function renderVencimientos(){
 
   // Donut
   const impMap={};
-  tareas.forEach(t=>{const k=t.imp.replace(/IIBB /,'').split(' ')[0];impMap[k]=(impMap[k]||0)+1;});
+  tareas.forEach(t=>{impMap[t.imp]=(impMap[t.imp]||0)+1;});
   const labels=Object.keys(impMap), vals=labels.map(k=>impMap[k]);
   const iColors=['#4f7ef8','#22c55e','#f59e0b','#a855f7','#ef4444','#14b8a6','#f97316','#ec4899'];
   if(impChartInst){impChartInst.destroy();impChartInst=null;}
@@ -780,7 +781,7 @@ function renderVencimientos(){
   // Filtro impuesto
   const sel=document.getElementById('fImp');
   const cur=sel.value;
-  sel.innerHTML='<option value="">Todos los impuestos</option>'+labels.map(k=>`<option${k===cur?' selected':''}>${k}</option>`).join('');
+  sel.innerHTML='<option value="">Todos los impuestos</option>'+labels.map(k=>`<option value="${k}"${k===cur?' selected':''}>${k}</option>`).join('');
   renderTablaVenc();
 }
 
@@ -798,8 +799,7 @@ function renderTablaVenc(){
   const tareas=genTareas(mes);
   vFiltered=tareas.filter(t=>{
     if(fR&&t.resp!==fR) return false;
-    const ik=t.imp.replace(/IIBB /,'').split(' ')[0];
-    if(fI&&ik!==fI) return false;
+    if(fI&&t.imp!==fI) return false;
     if(fE&&getEstadoV(t)!==fE) return false;
     return true;
   });
@@ -857,15 +857,16 @@ function toggleV(key,type){
 
 // ─── MODAL TAREA ─────────────────────────────────────────────────────────────
 let editIdx=null;
-function abrirModal(idx=null){
+function abrirModal(idx){
   editIdx=null;
   document.getElementById('fTitulo').value='';
   document.getElementById('fCat').value='Facturación';
   document.getElementById('fResp2').value='Mahsen';
   document.getElementById('fFecha').value='';
-  document.getElementById('colorYellow').checked=true;
+  const cy=document.getElementById('colorYellow');
+  if(cy) cy.checked=true;
   document.getElementById('modalOverlay').classList.add('open');
-  setTimeout(()=>document.getElementById('fTitulo').focus(),100);
+  setTimeout(()=>{const el=document.getElementById('fTitulo');if(el)el.focus();},150);
 }
 function cerrarModal(){document.getElementById('modalOverlay').classList.remove('open');}
 function guardarNota(){
@@ -1019,7 +1020,7 @@ function renderControl(){
   `;
 
   // Ranking
-  const resps=['Mahsen','Emme','Nabil','Emme'];
+  const resps=['Mahsen','Nabil','Emme'];
   const colors={Mahsen:'#4f7ef8',Emme:'#a855f7',Nabil:'#22c55e',Emme:'#f59e0b'};
   const ranking=resps.map(r=>{
     const rt=tareas.filter(t=>t.resp===r).length;
