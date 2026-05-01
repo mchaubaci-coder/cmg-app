@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Estudio CMG — Sistema de Gestión</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #0f1117;
+  --bg2: #161922;
+  --bg3: #1e2330;
+  --bg4: #252b3b;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8eaf0;
+  --text2: #8b91a8;
+  --text3: #555e78;
+  --accent: #4f7ef8;
+  --accent2: #6c8ffb;
+  --green: #22c55e;
+  --green-bg: rgba(34,197,94,0.12);
+  --red: #ef4444;
+  --red-bg: rgba(239,68,68,0.12);
+  --yellow: #f59e0b;
+  --yellow-bg: rgba(245,158,11,0.12);
+  --purple: #a855f7;
+  --purple-bg: rgba(168,85,247,0.12);
+  --mahsen: #4f7ef8;
+  --nabil: #22c55e;
+  --emme: #f59e0b;
+  --samira: #a855f7;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+/* SIDEBAR */
+.layout { display: flex; height: 100vh; overflow: hidden; }
+.sidebar { width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+.sidebar-logo { padding: 22px 20px 16px; border-bottom: 1px solid var(--border); }
+.sidebar-logo .logo-mark { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--accent); letter-spacing: -0.5px; }
+.sidebar-logo .logo-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+.sidebar-nav { flex: 1; padding: 12px 0; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; cursor: pointer; color: var(--text2); font-size: 13px; font-weight: 400; border-left: 2px solid transparent; transition: all .15s; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: var(--bg3); color: var(--accent); border-left-color: var(--accent); }
+.nav-icon { width: 16px; height: 16px; opacity: .7; flex-shrink: 0; }
+.nav-item.active .nav-icon { opacity: 1; }
+.sidebar-footer { padding: 16px 20px; border-top: 1px solid var(--border); }
+.date-badge { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); }
+
+/* MAIN */
+.main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; }
+.topbar { padding: 18px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg2); position: sticky; top: 0; z-index: 10; }
+.topbar-title { font-size: 16px; font-weight: 500; }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.mes-select { background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 7px 12px; border-radius: var(--radius); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius); border: 1px solid var(--border2); background: var(--bg3); color: var(--text); font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; transition: all .15s; font-weight: 400; }
+.btn:hover { background: var(--bg4); border-color: var(--border2); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.content { padding: 24px 28px; flex: 1; }
+
+/* SECCIONES */
+.section { display: none; }
+.section.active { display: block; }
+
+/* KPI ROW */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px; }
+.kpi-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+.kpi-val { font-size: 28px; font-weight: 500; font-family: 'DM Mono', monospace; line-height: 1; }
+.kpi-card.c-blue .kpi-val { color: var(--accent); }
+.kpi-card.c-green .kpi-val { color: var(--green); }
+.kpi-card.c-red .kpi-val { color: var(--red); }
+.kpi-card.c-yellow .kpi-val { color: var(--yellow); }
+.kpi-sub { font-size: 11px; color: var(--text3); margin-top: 6px; }
+
+/* ALERTAS */
+.alertas { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+.alerta { display: flex; align-items: center; gap: 12px; padding: 11px 16px; border-radius: var(--radius); font-size: 13px; border: 1px solid; }
+.alerta-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.alerta.red { background: var(--red-bg); border-color: rgba(239,68,68,0.25); color: #fca5a5; }
+.alerta.red .alerta-dot { background: var(--red); }
+.alerta.yellow { background: var(--yellow-bg); border-color: rgba(245,158,11,0.25); color: #fcd34d; }
+.alerta.yellow .alerta-dot { background: var(--yellow); }
+.alerta.blue { background: rgba(79,126,248,0.1); border-color: rgba(79,126,248,0.25); color: #93b4fd; }
+.alerta.blue .alerta-dot { background: var(--accent); }
+.alerta.green { background: var(--green-bg); border-color: rgba(34,197,94,0.25); color: #86efac; }
+.alerta.green .alerta-dot { background: var(--green); }
+
+/* CHARTS ROW */
+.charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.chart-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; }
+.chart-title { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+
+/* PROGRESS BARS */
+.prog-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.prog-name { font-size: 12px; font-weight: 500; width: 60px; flex-shrink: 0; }
+.prog-track { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 3px; transition: width .5s ease; }
+.prog-stats { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--text3); width: 52px; text-align: right; flex-shrink: 0; }
+
+/* TABLA */
+.tabla-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
+.tabla-filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.filter-sel { background: var(--bg3); border: 1px solid var(--border); color: var(--text2); padding: 6px 10px; border-radius: var(--radius); font-size: 12px; font-family: 'DM Sans', sans-serif; cursor: pointer; }
+.tabla-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+thead th { background: var(--bg3); color: var(--text3); font-weight: 500; padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--bg3); }
+tbody tr.done-row { opacity: .55; }
+tbody td { padding: 9px 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+.b-hecho { background: var(--green-bg); color: var(--green); }
+.b-vencido { background: var(--red-bg); color: var(--red); }
+.b-urgente { background: var(--yellow-bg); color: var(--yellow); }
+.b-pendiente { background: rgba(139,145,168,0.12); color: var(--text2); }
+.b-agip { background: rgba(168,85,247,0.12); color: #c084fc; }
+.b-conv { background: rgba(79,126,248,0.12); color: #93b4fd; }
+.b-arba { background: rgba(239,68,68,0.12); color: #fca5a5; }
+.b-sanluis { background: rgba(34,197,94,0.12); color: #86efac; }
+.b-alta { background: rgba(239,68,68,0.15); color: #fca5a5; }
+.b-media { background: rgba(245,158,11,0.15); color: #fcd34d; }
+.b-baja { background: rgba(139,145,168,0.12); color: var(--text2); }
+.b-cat { background: rgba(79,126,248,0.1); color: #93b4fd; }
+
+/* CHECK BUTTONS */
+.chk { width: 20px; height: 20px; border-radius: 5px; border: 1.5px solid var(--border2); background: transparent; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; transition: all .15s; flex-shrink: 0; }
+.chk:hover { border-color: var(--accent); }
+.chk.done { background: var(--green); border-color: var(--green); color: #fff; }
+.chk.mailed { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* RESP COLORS */
+.r-mahsen { color: var(--mahsen); font-weight: 500; }
+.r-nabil { color: var(--nabil); font-weight: 500; }
+.r-emme { color: var(--emme); font-weight: 500; }
+.r-samira { color: var(--samira); font-weight: 500; }
+
+/* PAGINACION */
+.paginacion { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text3); }
+
+/* MODAL TAREA */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 100; display: none; align-items: center; justify-content: center; padding: 20px; }
+.modal-overlay.open { display: flex; }
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--radius-lg); padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+.modal-title { font-size: 15px; font-weight: 500; margin-bottom: 20px; }
+.form-row { margin-bottom: 14px; }
+.form-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 6px; display: block; }
+.form-input, .form-select, .form-textarea { width: 100%; background: var(--bg3); border: 1px solid var(--border2); color: var(--text); padding: 9px 12px; border-radius: var(--radius); font-size: 13px; font-family: 'DM Sans', sans-serif; }
+.form-textarea { resize: vertical; min-height: 70px; }
+.form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--accent); }
+.form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+
+/* TAREAS CARDS */
+.tareas-grid { display: flex; flex-direction: column; gap: 8px; }
+.tarea-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; display: flex; align-items: flex-start; gap: 12px; transition: border-color .15s; }
+.tarea-card:hover { border-color: var(--border2); }
+.tarea-card.done-card { opacity: .45; }
+.tarea-card.vencida-card { border-color: rgba(239,68,68,0.3); }
+.tarea-card.urgente-card { border-color: rgba(245,158,11,0.25); }
+.tarea-body { flex: 1; min-width: 0; }
+.tarea-titulo { font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+.tarea-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.tarea-desc { font-size: 12px; color: var(--text3); margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tarea-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.tarea-del { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--text3); cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+.tarea-del:hover { border-color: var(--red); color: var(--red); }
+
+/* CONTROL PANEL */
+.control-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.control-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px; }
+.control-card-title { font-size: 12px; font-weight: 500; color: var(--text2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+.ranking-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.ranking-row:last-child { border-bottom: none; }
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .sidebar { width: 56px; }
+  .sidebar-logo .logo-sub, .nav-item span, .sidebar-footer { display: none; }
+  .nav-item { padding: 12px; justify-content: center; }
+  .charts-row, .control-grid { grid-template-columns: 1fr; }
+  .content { padding: 16px; }
+  .topbar { padding: 14px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">CMG</div>
+    <div class="logo-sub">Sistema de Gestión</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" onclick="showSection('vencimientos')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="2" width="14" height="13" rx="2"/><path d="M1 6h14M5 1v2M11 1v2"/></svg>
+      <span>Vencimientos</span>
+    </div>
+    <div class="nav-item" onclick="showSection('tareas')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+      <span>Tareas</span>
+    </div>
+    <div class="nav-item" onclick="showSection('control')">
+      <svg class="nav-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 12 L5 8 L8 10 L11 5 L14 7"/><circle cx="14" cy="7" r="1" fill="currentColor"/></svg>
+      <span>Control</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="date-badge" id="todayDate"></div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbarTitle">Vencimientos</div>
+    <div class="topbar-right">
+      <select class="mes-select" id="mesSelect" onchange="renderVencimientos()">
+        <option>Mayo</option><option>Junio</option><option>Julio</option>
+        <option>Agosto</option><option>Septiembre</option><option>Octubre</option>
+        <option>Noviembre</option><option>Diciembre</option>
+      </select>
+      <button class="btn btn-primary" id="btnNuevaTarea" onclick="abrirModal()" style="display:none">+ Nueva tarea</button>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- VENCIMIENTOS -->
+    <div class="section active" id="sec-vencimientos">
+      <div class="kpi-row" id="kpiRow"></div>
+      <div class="alertas" id="alertasVenc"></div>
+      <div class="charts-row">
+        <div class="chart-card">
+          <div class="chart-title">Progreso por responsable</div>
+          <div id="progResp"></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Distribución por impuesto</div>
+          <div style="position:relative;height:180px"><canvas id="chartImp" role="img" aria-label="Distribución por tipo de impuesto"></canvas></div>
+        </div>
+      </div>
+      <div class="tabla-header">
+        <span style="font-size:13px;color:var(--text2)" id="tablaCount"></span>
+        <div class="tabla-filters">
+          <select class="filter-sel" id="fResp" onchange="renderTablaVenc()"><option value="">Todos los responsables</option><option>Mahsen</option><option>Nabil</option><option>Emme</option></select>
+          <select class="filter-sel" id="fImp" onchange="renderTablaVenc()"><option value="">Todos los impuestos</option></select>
+          <select class="filter-sel" id="fEst" onchange="renderTablaVenc()"><option value="">Todos los estados</option><option value="pendiente">Pendiente</option><option value="urgente">Urgente</option><option value="vencido">Vencido</option><option value="hecho">Hecho</option></select>
+        </div>
+      </div>
+      <div class="tabla-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th colspan="2" style="width:56px;text-align:center;font-size:10px;padding-bottom:2px;border-bottom:none">
+                <span style="color:#22c55e">✓Hecho</span> / <span style="color:#4f7ef8">✉Mail</span>
+              </th>
+              <th style="width:130px">Cliente</th>
+              <th style="width:105px;cursor:pointer" id="th-imp" onclick="sortBy('imp')">Impuesto ↕</th>
+              <th style="width:72px;cursor:pointer" id="th-tent" onclick="sortBy('tent')">Fecha trabajo ↕</th>
+              <th style="width:72px;cursor:pointer;color:var(--accent)" id="th-vto" onclick="sortBy('vto')">Vto. ↕</th>
+              <th style="width:65px">Jurisd.</th>
+              <th style="width:55px">Resp.</th>
+              <th style="width:68px">Estado</th>
+            </tr>
+          </thead>
+          <tbody id="tbodyVenc"></tbody>
+        </table>
+        <div class="paginacion" id="pagVenc"></div>
+      </div>
+    </div>
+
+    <!-- TAREAS -->
+    <div class="section" id="sec-tareas">
+      <div class="kpi-row" id="kpiTareas"></div>
+      <div class="alertas" id="alertasTareas"></div>
+      <div class="tabla-header">
+        <span style="font-size:13px;color:var(--text2)" id="tareasCount"></span>
+        <div class="tabla-filters">
+          <select class="filter-sel" id="ftResp" onchange="renderTareas()"><option value="">Todos</option><option>Mahsen</option><option>Nabil</option><option>Emme</option></select>
+          <select class="filter-sel" id="ftPrio" onchange="renderTareas()"><option value="">Toda prioridad</option><option>Alta</option><option>Media</option><option>Baja</option></select>
+          <select class="filter-sel" id="ftCat" onchange="renderTareas()"><option value="">Toda categoría</option><option>Facturación</option><option>Documentación</option><option>Consulta</option><option>Llamado</option><option>Reunión</option><option>Trámite AFIP</option><option>Trámite ARCA</option><option>Otros</option></select>
+          <select class="filter-sel" id="ftEst" onchange="renderTareas()"><option value="">Todos los estados</option><option value="abierta">Abiertas</option><option value="urgente">Urgentes</option><option value="vencida">Vencidas</option><option value="cerrada">Cerradas</option></select>
+        </div>
+      </div>
+      <div class="tareas-grid" id="tareasGrid"></div>
+    </div>
+
+    <!-- CONTROL -->
+    <div class="section" id="sec-control">
+      <div class="kpi-row" id="kpiControl"></div>
+      <div class="control-grid">
+        <div class="control-card">
+          <div class="control-card-title">Ranking de cierre (mes activo)</div>
+          <div id="rankingResp"></div>
+        </div>
+        <div class="control-card">
+          <div class="control-card-title">Tareas sin movimiento +7 días</div>
+          <div id="tareasEstancadas"></div>
+        </div>
+      </div>
+      <div class="control-card" style="margin-bottom:16px">
+        <div class="control-card-title">Progreso anual — vencimientos completados por mes</div>
+        <div style="position:relative;height:200px"><canvas id="chartAnual" role="img" aria-label="Progreso anual de vencimientos por mes"></canvas></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+</div>
+
+<!-- MODAL NUEVA TAREA -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">Nueva tarea</div>
+    <div class="form-row">
+      <label class="form-label">Título *</label>
+      <input class="form-input" id="fTitulo" placeholder="Ej: Presentación DDJJ cliente Lamas">
+    </div>
+    <div class="form-row">
+      <label class="form-label">Descripción</label>
+      <textarea class="form-textarea" id="fDesc" placeholder="Detalle de la tarea..."></textarea>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Cliente</label>
+      <input class="form-input" id="fCliente" placeholder="Nombre del cliente (opcional)">
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Categoría</label>
+        <select class="form-select" id="fCat">
+          <option>Facturación</option><option>Documentación</option><option>Consulta</option>
+          <option>Llamado</option><option>Reunión</option><option>Trámite AFIP</option>
+          <option>Trámite ARCA</option><option>Otros</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Prioridad</label>
+        <select class="form-select" id="fPrio">
+          <option>Alta</option><option selected>Media</option><option>Baja</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row-2">
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Responsable</label>
+        <select class="form-select" id="fResp2">
+          <option>Mahsen</option><option>Nabil</option><option>Emme</option>
+        </select>
+      </div>
+      <div class="form-row" style="margin:0">
+        <label class="form-label">Fecha crítica</label>
+        <input class="form-input" type="date" id="fFecha">
+      </div>
+    </div>
+    <div class="form-row">
+      <label class="form-label">Recordatorio</label>
+      <select class="form-select" id="fRecordatorio">
+        <option value="">Sin recordatorio</option>
+        <option value="1">1 día antes</option>
+        <option value="2">2 días antes</option>
+        <option value="3">3 días antes</option>
+        <option value="7">1 semana antes</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="cerrarModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="guardarTarea()">Guardar tarea</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TODAY = new Date(); TODAY.setHours(0,0,0,0);
+document.getElementById('todayDate').textContent = TODAY.toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'});
+
+function diffDays(dateStr) {
+  if(!dateStr) return null;
+  const [y,m,d] = dateStr.split('-').map(Number);
+  const dt = new Date(y,m-1,d);
+  return Math.round((dt - TODAY) / 86400000);
+}
+function diffDaysDMY(s) {
+  const [d,m,y] = s.split('/').map(Number);
+  const dt = new Date(y,m-1,d);
+  return Math.round((dt - TODAY) / 86400000);
+}
+function parseDMY(s) { const [d,m,y]=s.split('/').map(Number); return new Date(y,m-1,d); }
+function fmtDMY(s) { return s.slice(0,5); }
+function addDays(dateStr, n) {
+  const [d,m,y]=dateStr.split('/').map(Number);
+  const dt=new Date(y,m-1,d); dt.setDate(dt.getDate()+n);
+  return `${String(dt.getDate()).padStart(2,'0')}/${String(dt.getMonth()+1).padStart(2,'0')}/${dt.getFullYear()}`;
+}
+function tentativa(vto) { return addDays(vto,-3); }
+function respClass(r) { return r==='Mahsen'?'r-mahsen':r==='Nabil'?'r-nabil':'r-emme'; }
+function jurisdBadge(j) {
+  if(j==='AGIP') return '<span class="badge b-agip">AGIP</span>';
+  if(j==='Convenio') return '<span class="badge b-conv">Conv.</span>';
+  if(j==='ARBA') return '<span class="badge b-arba">ARBA</span>';
+  if(j==='San Luis') return '<span class="badge b-sanluis">S.Luis</span>';
+  return '<span class="badge b-pendiente">—</span>';
+}
+
+// ─── DATOS CLIENTES (compacto) ────────────────────────────────────────────────
+// [nombre, cuit, dv, tipo, mono, auto, iibb, iva, gan, antGan, f931, resp]
+const CL=[
+["Cesar Lamas",20359800410,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Cecilia Lamas",27235983015,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Juan Gelay",20350953680,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Mariam El Cheij",27393385710,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Jesus S. Andrada",20370292850,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["SILVIO OMAR PAIVA",20375841046,6,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Cesar Daniel Barreto",20467290593,3,"Mono",1,0,"Convenio",0,0,0,0,"Emme"],
+["Camilo Al Cheij",20376049486,6,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
+["SANDRA MAFUD",27181403743,3,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Paula San Miguel",27340957178,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Federico Farfaglia",20360878350,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Daniela Albornoz",27218455528,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["APPOLLONI JUAN IGNACIO",20322679530,0,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["APPOLLONI MILAGROS",27407320102,2,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Juan Pablo Appolloni",23352020419,9,"RI",0,1,"AGIP",1,1,1,0,"Emme"],
+["Paola Virginia Romano",27217957430,0,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Ricardo Lazzati",20134361930,0,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Mariam Abdala",27355173971,1,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Daniel Al Jatib",20340564635,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["HELENA BARISCHPOLSKI",27108238351,1,"RI",0,1,"Convenio",1,1,1,1,"Mahsen"],
+["NORBERTO SAVINO",20076424617,7,"RI",0,1,"---",1,1,1,1,"Mahsen"],
+["Magali Camarda",27394333102,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Nicolas Sanchez",20331044602,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Martin Kelly",20328486262,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["RAUL DELLUTRI",20264726582,2,"Mono",1,0,"ARBA",0,0,0,0,"Mahsen"],
+["Carnevale Inti Nahuel",20326365549,9,"Mono",1,0,"ARBA",0,0,0,0,"Mahsen"],
+["MADDONI JUAN MANUEL",20252274902,2,"RI",0,1,"AGIP",1,1,1,0,"Mahsen"],
+["TOLEDO MARIA JOSE",27370495942,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Maia Ale",27350764513,3,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Federico M. Zayoud",20351600293,3,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Benjamin Klahman",20266225343,3,"Mono",1,0,"AGIP",0,0,0,1,"Nabil"],
+["Ignacio Cativa",20362731403,3,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
+["Luciano Staffora",20366850903,3,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Ignacio A. Depaoli",23347444359,9,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Vilma Garcia",27123781274,4,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["M.M. GONZALEZ VANEZCA",27958533484,4,"RI",0,1,"AGIP",1,1,1,0,"Emme"],
+["Paula Tapella",23165582594,4,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
+["Alejandra Tapella",27149524768,8,"RI",0,1,"Convenio",1,1,1,0,"Emme"],
+["Fernando Rastrilla",20315180504,4,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Lucia Serres Zelada",27190751568,8,"Mono",1,0,"San Luis",0,0,0,0,"Mahsen"],
+["Veronica Ramondegui",27373451814,4,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Gustavo Jaurena",20145753245,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Maria Marta Zuliani",27222971115,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Jose Caceres",20258752865,2,"SS",0,1,"AGIP",1,1,1,0,"Emme"],
+["Rocio Pizza",27450424205,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Soledad Sanchez",27292188566,6,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Hernan Sosa",20268875485,5,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["SANCHEZ FACUNDO",20266889586,6,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["PIERINI MARIA LAURA",27147844986,6,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Daniel Treife",20268526367,7,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Andres Valerio Rojas",20957090347,7,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Sebastian Zayoud",20281540468,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Jorge Oscar Adad",20207601048,8,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["J.E. CORTEZ SCHUMACHER",20345377078,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["SIMON MARTINEZ MOLINA",20958813938,8,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Edinson Apolinar Tirado",20957102868,8,"Mono",1,0,"AGIP",0,0,0,1,"Nabil"],
+["DIAZ LEON YOLIMAR",27191418374,4,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Milton G. Cardoso",23342118119,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Luciano Mahmond",20353677609,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Osvaldo Luis Galvan",20184049059,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Lucila Grossman",27373402619,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Viviana E. Luif",27176050689,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Sandra Leiva",27247469007,7,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["martin abas (Tethim)",20322160950,0,"SRL",0,1,"Convenio",1,1,1,1,"Emme"],
+["Francisco Calvo (JFC)",20364044349,9,"SS",1,1,"Convenio",1,1,1,0,"Emme"],
+["Transporte Bellini SRL",20338603100,0,"SRL",0,1,"ARBA",1,1,1,1,"Emme"],
+["Amelia Maria Celiz",27109220189,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Daniel Zavaleta Ceclen",20944176226,6,"RI",0,1,"AGIP",1,1,1,1,"Emme"],
+["Gerline Ladera D.L.R.",27190902787,7,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["VICTORIA BELLANTI",27406399910,0,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Francisco Colombato",20386181307,7,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["PEREYRA Ignacio",20361533969,9,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Ines Navarlatz",27334040009,9,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Ariel A. Martinez",20304941848,8,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+["Patricia Miranda",27408950622,2,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Carbajal Agustin",20425885384,4,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Silvina Rios Arredondo",27956327615,5,"Mono",1,0,"Convenio",0,0,0,0,"Nabil"],
+["Jose Chaubaci",20135019438,8,"RI",0,1,"AGIP",1,1,1,0,"Mahsen"],
+["Mahsen Chaubaci",20370390127,7,"Mono",1,0,"AGIP",0,0,0,0,"Nabil"],
+["Noelia Pace",27369192898,8,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["Amina Brahem",24383897625,5,"Mono",1,0,"Convenio",0,0,0,0,"Mahsen"],
+["HASSAN CHABAN",23368679429,9,"Mono",1,0,"AGIP",0,0,0,0,"Mahsen"],
+];
+
+const MONO_VTO={5:"20/05/2026",6:"22/06/2026",7:"20/07/2026",8:"20/08/2026",9:"21/09/2026",10:"20/10/2026",11:"20/11/2026",12:"21/12/2026"};
+const MONO_RECATEG={8:"05/08/2026"};
+const AUTO={5:["05/05","06/05","07/05"],6:["05/06","08/06","09/06"],7:["06/07","07/07","08/07"],8:["05/08","06/08","07/08"],9:["07/09","08/09","09/09"],10:["05/10","06/10","07/10"],11:["05/11","06/11","09/11"],12:["07/12","09/12","10/12"]};
+const CONV={5:["15/05","18/05","19/05","20/05"],6:["16/06","17/06","18/06","19/06"],7:["15/07","16/07","17/07","20/07"],8:["14/08","18/08","19/08","20/08"],9:["15/09","16/09","17/09","18/09"],10:["15/10","16/10","19/10","20/10"],11:["13/11","16/11","17/11","18/11"],12:["15/12","16/12","17/12","18/12"]};
+const AGIP={5:["11/05","12/05","13/05","14/05","15/05"],6:["11/06","12/06","16/06","17/06","18/06"],7:["13/07","14/07","15/07","16/07","17/07"],8:["11/08","12/08","13/08","14/08","18/08"],9:["11/09","14/09","15/09","16/09","17/09"],10:["13/10","14/10","15/10","16/10","19/10"],11:["11/11","12/11","13/11","16/11","17/11"],12:["11/12","14/12","15/12","16/12","17/12"]};
+const IVA={5:["18/05","19/05","20/05","21/05","22/05"],6:["18/06","19/06","22/06","23/06","24/06"],7:["20/07","21/07","22/07","23/07","24/07"],8:["18/08","19/08","20/08","21/08","24/08"],9:["18/09","21/09","22/09","23/09","24/09"],10:["19/10","20/10","21/10","22/10","23/10"],11:["18/11","19/11","20/11","23/11","24/11"],12:["18/12","21/12","22/12","23/12","24/12"]};
+const F931={5:["09/06","10/06","11/06"],6:["10/07","13/07","14/07"],7:["10/08","11/08","12/08"],8:["09/09","10/09","11/09"],9:["09/10","12/10","13/10"],10:["09/11","10/11","11/11"],11:["09/12","10/12","11/12"]};
+const ANTICIPOS={6:["11/06","12/06","16/06","17/06","18/06"],8:["11/08","12/08","13/08","16/08","17/08"],10:["13/10","14/10","15/10","16/10","19/10"],12:["11/12","14/12","15/12","16/12","17/12"]};
+const ANT_LABELS={6:"1er Anticipo Ganancias",8:"2do Anticipo Ganancias",10:"3er Anticipo Ganancias",12:"4to Anticipo Ganancias"};
+const MESES_N={Mayo:5,Junio:6,Julio:7,Agosto:8,Septiembre:9,Octubre:10,Noviembre:11,Diciembre:12};
+const MESES_PREV={5:"Abril",6:"Mayo",7:"Junio",8:"Julio",9:"Agosto",10:"Septiembre",11:"Octubre",12:"Noviembre"};
+
+function full(dd,m){return dd+"/"+String(m).padStart(2,'0')+"/2026"}
+function autoV(m,dv){const t=AUTO[m];const s=dv<=3?t[0]:dv<=6?t[1]:t[2];return full(s.split('/')[0],s.split('/')[1])}
+function convV(m,cl){const t=CONV[m];const d=+String(cl).slice(-1);const s=d<=2?t[0]:d<=5?t[1]:d<=7?t[2]:t[3];return full(s.split('/')[0],s.split('/')[1])}
+function agipV(m,dv){const t=AGIP[m];const s=dv<=1?t[0]:dv<=3?t[1]:dv<=5?t[2]:dv<=7?t[3]:t[4];return full(s.split('/')[0],s.split('/')[1])}
+function ivaV(m,dv){const t=IVA[m];const s=dv<=1?t[0]:dv<=3?t[1]:dv<=5?t[2]:dv<=7?t[3]:t[4];return full(s.split('/')[0],s.split('/')[1])}
+function f931V(m,dv){if(!F931[m])return null;const t=F931[m];const s=dv<=3?t[0]:dv<=6?t[1]:t[2];return full(s.split('/')[0],s.split('/')[1])}
+function anticV(m,dv){const t=ANTICIPOS[m];const s=dv<=1?t[0]:dv<=3?t[1]:dv<=5?t[2]:dv<=7?t[3]:t[4];return full(s.split('/')[0],s.split('/')[1])}
+const GAN_VTO={0:"11/06/2026",1:"11/06/2026",2:"12/06/2026",3:"12/06/2026",4:"16/06/2026",5:"16/06/2026",6:"17/06/2026",7:"17/06/2026",8:"18/06/2026",9:"18/06/2026"};
+
+function genTareas(mesNombre) {
+  const m=MESES_N[mesNombre]; const tareas=[];
+  CL.forEach(cl=>{
+    const[nombre,cuit,dv,tipo,mono,auto,iibb,iva,gan,antGan,f931,resp]=cl;
+    const cl_last=+String(cuit).slice(-1);
+    function add(imp,vto,jur){
+      const key=`${mesNombre}|${imp}|${cuit}`;
+      tareas.push({imp,nombre,cuit:String(cuit),dv,tipo,jur:jur||"—",vto,tent:tentativa(vto),resp,key});
+    }
+    if(mono&&MONO_VTO[m]) add("Monotributo",MONO_VTO[m]);
+    if(mono&&MONO_RECATEG[m]) add("Recategorización",MONO_RECATEG[m]);
+    if(auto&&AUTO[m]) add("Autónomos",autoV(m,dv));
+    if(iibb&&iibb!=="---"&&iibb!=="----"){
+      const vto=iibb==="AGIP"?agipV(m,dv):convV(m,cl_last);
+      add(`IIBB ${iibb}`,vto,iibb);
+    }
+    if(iva&&IVA[m]) add("IVA",ivaV(m,dv));
+    if(f931){const v=f931V(m-1,dv);if(v)add("F.931",v);}
+    if(gan&&m===6) add("Ganancias PH",GAN_VTO[dv]||"16/06/2026");
+    if(antGan&&ANTICIPOS[m]) add(ANT_LABELS[m],anticV(m,dv));
+  });
+  tareas.sort((a,b)=>parseDMY(a.vto)-parseDMY(b.vto)||a.imp.localeCompare(b.imp));
+  return tareas;
+}
+
+// ─── ESTADO ───────────────────────────────────────────────────────────────────
+const doneState={}, mailState={};
+let tareasDinamicas = JSON.parse(localStorage.getItem('cmg_tareas')||'[]');
+function saveTareas(){localStorage.setItem('cmg_tareas',JSON.stringify(tareasDinamicas));}
+
+// ─── SECCIONES ────────────────────────────────────────────────────────────────
+let impChartInst=null, anualChartInst=null;
+function showSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('sec-'+id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  const titles={vencimientos:'Vencimientos',tareas:'Tareas del estudio',control:'Control y seguimiento'};
+  document.getElementById('topbarTitle').textContent=titles[id];
+  document.getElementById('mesSelect').style.display=id==='vencimientos'?'':'none';
+  document.getElementById('btnNuevaTarea').style.display=id==='tareas'?'':'none';
+  if(id==='vencimientos') renderVencimientos();
+  if(id==='tareas') renderTareas();
+  if(id==='control') renderControl();
+}
+
+
+// ─── SORT ─────────────────────────────────────────────────────────────────────
+let vSortCol='vto', vSortDir=1;
+function sortBy(col){
+  if(vSortCol===col) vSortDir*=-1;
+  else{vSortCol=col;vSortDir=1;}
+  // update header arrows
+  ['imp','tent','vto'].forEach(c=>{
+    const el=document.getElementById('th-'+c);
+    if(el) el.style.color=c===col?'var(--accent)':'var(--text3)';
+  });
+  renderTablaVenc();
+}
+
+// ─── VENCIMIENTOS ─────────────────────────────────────────────────────────────
+let vPage=0; const V_PAGE=25; let vFiltered=[];
+function renderVencimientos(){
+  vPage=0;
+  const mes=document.getElementById('mesSelect').value;
+  const tareas=genTareas(mes);
+  const total=tareas.length;
+  const hechas=tareas.filter(t=>doneState[t.key]).length;
+  const venc=tareas.filter(t=>!doneState[t.key]&&diffDaysDMY(t.vto)<0).length;
+  const urg=tareas.filter(t=>!doneState[t.key]&&diffDaysDMY(t.vto)>=0&&diffDaysDMY(t.vto)<=3).length;
+  const sinMail=tareas.filter(t=>doneState[t.key]&&!mailState[t.key]).length;
+  const pct=total?Math.round(hechas/total*100):0;
+
+  document.getElementById('kpiRow').innerHTML=`
+    <div class="kpi-card c-blue"><div class="kpi-label">Total</div><div class="kpi-val">${total}</div><div class="kpi-sub">${mes} 2026</div></div>
+    <div class="kpi-card c-green"><div class="kpi-label">Completadas</div><div class="kpi-val">${hechas}</div><div class="kpi-sub">${pct}%</div></div>
+    <div class="kpi-card"><div class="kpi-label">Pendientes</div><div class="kpi-val" style="color:var(--text)">${total-hechas}</div></div>
+    <div class="kpi-card ${venc>0?'c-red':''}"><div class="kpi-label">Vencidas</div><div class="kpi-val">${venc}</div></div>
+    <div class="kpi-card ${urg>0?'c-yellow':''}"><div class="kpi-label">Urgentes</div><div class="kpi-val">${urg}</div><div class="kpi-sub">≤ 3 días</div></div>
+    <div class="kpi-card ${sinMail>0?'c-yellow':''}"><div class="kpi-label">Sin mail</div><div class="kpi-val">${sinMail}</div></div>
+  `;
+
+  // Alertas
+  let aHtml='';
+  if(venc>0) aHtml+=`<div class="alerta red"><div class="alerta-dot"></div><strong>${venc} tarea${venc>1?'s':''} vencida${venc>1?'s':''}</strong> — revisá y regularizá</div>`;
+  if(urg>0) aHtml+=`<div class="alerta yellow"><div class="alerta-dot"></div><strong>${urg} tarea${urg>1?'s':''} urgente${urg>1?'s':''}</strong> — vencen en los próximos 3 días</div>`;
+  if(sinMail>0) aHtml+=`<div class="alerta blue"><div class="alerta-dot"></div><strong>${sinMail} sin confirmar por mail</strong> — trabajo hecho sin aviso al cliente</div>`;
+  if(!aHtml) aHtml=`<div class="alerta green"><div class="alerta-dot"></div>Sin alertas activas para ${mes}. Todo en orden.</div>`;
+  document.getElementById('alertasVenc').innerHTML=aHtml;
+
+  // Progreso por responsable
+  const resps=['Mahsen','Emme','Nabil','Emme'];
+  const colors={Mahsen:'#4f7ef8',Emme:'#a855f7',Nabil:'#22c55e',Emme:'#f59e0b'};
+  let pHtml='';
+  resps.forEach(r=>{
+    const rt=tareas.filter(t=>t.resp===r).length;
+    const rd=tareas.filter(t=>t.resp===r&&doneState[t.key]).length;
+    if(!rt) return;
+    const pct=Math.round(rd/rt*100);
+    pHtml+=`<div class="prog-row">
+      <div class="prog-name" style="color:${colors[r]}">${r}</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%;background:${colors[r]}"></div></div>
+      <div class="prog-stats">${rd}/${rt}</div>
+    </div>`;
+  });
+  document.getElementById('progResp').innerHTML=pHtml;
+
+  // Donut
+  const impMap={};
+  tareas.forEach(t=>{const k=t.imp.replace(/IIBB /,'').split(' ')[0];impMap[k]=(impMap[k]||0)+1;});
+  const labels=Object.keys(impMap), vals=labels.map(k=>impMap[k]);
+  const iColors=['#4f7ef8','#22c55e','#f59e0b','#a855f7','#ef4444','#14b8a6','#f97316','#ec4899'];
+  if(impChartInst){impChartInst.destroy();impChartInst=null;}
+  impChartInst=new Chart(document.getElementById('chartImp').getContext('2d'),{
+    type:'doughnut',
+    data:{labels,datasets:[{data:vals,backgroundColor:iColors.slice(0,labels.length),borderWidth:2,borderColor:'#161922'}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'right',labels:{color:'#8b91a8',font:{size:10},boxWidth:10,padding:6}}}}
+  });
+
+  // Filtro impuesto
+  const sel=document.getElementById('fImp');
+  const cur=sel.value;
+  sel.innerHTML='<option value="">Todos los impuestos</option>'+labels.map(k=>`<option${k===cur?' selected':''}>${k}</option>`).join('');
+  renderTablaVenc();
+}
+
+function getEstadoV(t){
+  if(doneState[t.key]) return 'hecho';
+  const d=diffDaysDMY(t.vto);
+  if(d<0) return 'vencido'; if(d<=3) return 'urgente'; return 'pendiente';
+}
+
+function renderTablaVenc(){
+  const mes=document.getElementById('mesSelect').value;
+  const fR=document.getElementById('fResp').value;
+  const fI=document.getElementById('fImp').value;
+  const fE=document.getElementById('fEst').value;
+  const tareas=genTareas(mes);
+  vFiltered=tareas.filter(t=>{
+    if(fR&&t.resp!==fR) return false;
+    const ik=t.imp.replace(/IIBB /,'').split(' ')[0];
+    if(fI&&ik!==fI) return false;
+    if(fE&&getEstadoV(t)!==fE) return false;
+    return true;
+  });
+  // Apply sort
+  vFiltered.sort((a,b)=>{
+    let va,vb;
+    if(vSortCol==='imp'){va=a.imp;vb=b.imp;return vSortDir*va.localeCompare(vb);}
+    if(vSortCol==='tent'){va=parseDMY(a.tent);vb=parseDMY(b.tent);}
+    else{va=parseDMY(a.vto);vb=parseDMY(b.vto);}
+    return vSortDir*(va-vb);
+  });
+  document.getElementById('tablaCount').textContent=`${vFiltered.length} tareas`;
+  const start=vPage*V_PAGE;
+  const slice=vFiltered.slice(start,start+V_PAGE);
+  document.getElementById('tbodyVenc').innerHTML=slice.map(t=>{
+    const est=getEstadoV(t);
+    const bMap={hecho:'<span class="badge b-hecho">Hecho</span>',vencido:'<span class="badge b-vencido">Vencido</span>',urgente:'<span class="badge b-urgente">Urgente</span>',pendiente:'<span class="badge b-pendiente">Pendiente</span>'};
+    const done=doneState[t.key]; const mailed=mailState[t.key];
+    const diasVto=diffDaysDMY(t.vto);
+    const vtoColor=done?'var(--text3)':diasVto<0?'var(--red)':diasVto<=3?'var(--yellow)':'var(--text)';
+    const tentColor=done?'var(--text3)':'var(--text2)';
+    return `<tr class="${done?'done-row':''}">
+      <td title="Marcar como hecho"><button class="chk${done?' done':''}" onclick="toggleV('${t.key}','done')">${done?'✓':''}</button></td>
+      <td title="Mail enviado"><button class="chk${mailed?' mailed':''}" onclick="toggleV('${t.key}','mail')">${mailed?'✓':''}</button></td>
+      <td title="${t.nombre}">${t.nombre}</td>
+      <td style="font-size:11px">${t.imp}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:12px;color:${tentColor}">${fmtDMY(t.tent)}</td>
+      <td style="font-weight:500;font-family:'DM Mono',monospace;font-size:12px;color:${vtoColor}">${fmtDMY(t.vto)}</td>
+      <td>${jurisdBadge(t.jur)}</td>
+      <td class="${respClass(t.resp)}">${t.resp}</td>
+      <td>${bMap[est]}</td>
+    </tr>`;
+  }).join('');
+  const tot=vFiltered.length, pages=Math.ceil(tot/V_PAGE);
+  document.getElementById('pagVenc').innerHTML=`
+    <div style="font-size:12px;color:var(--text3)">${start+1}–${Math.min(start+V_PAGE,tot)} de ${tot}</div>
+    <div style="display:flex;gap:8px">
+      <button class="btn" onclick="vGoPage(${vPage-1})" ${vPage===0?'disabled':''} style="padding:5px 10px;font-size:12px">←</button>
+      <button class="btn" onclick="vGoPage(${vPage+1})" ${vPage>=pages-1?'disabled':''} style="padding:5px 10px;font-size:12px">→</button>
+    </div>`;
+}
+function vGoPage(p){vPage=p;renderTablaVenc();}
+function toggleV(key,type){
+  if(type==='done') doneState[key]=!doneState[key];
+  else mailState[key]=!mailState[key];
+  renderVencimientos();
+}
+
+// ─── MODAL TAREA ─────────────────────────────────────────────────────────────
+let editIdx=null;
+function abrirModal(idx=null){
+  editIdx=idx;
+  const m=document.getElementById;
+  if(idx!==null){
+    const t=tareasDinamicas[idx];
+    m('modalTitle').textContent='Editar tarea';
+    m('fTitulo').value=t.titulo;
+    m('fDesc').value=t.desc||'';
+    m('fCliente').value=t.cliente||'';
+    m('fCat').value=t.cat;
+    m('fPrio').value=t.prio;
+    m('fResp2').value=t.resp;
+    m('fFecha').value=t.fecha||'';
+    m('fRecordatorio').value=t.recordatorio||'';
+  } else {
+    m('modalTitle').textContent='Nueva tarea';
+    m('fTitulo').value='';m('fDesc').value='';m('fCliente').value='';
+    m('fCat').value='Facturación';m('fPrio').value='Media';m('fResp2').value='Mahsen';
+    m('fFecha').value='';m('fRecordatorio').value='';
+  }
+  document.getElementById('modalOverlay').classList.add('open');
+  document.getElementById('fTitulo').focus();
+}
+function cerrarModal(){document.getElementById('modalOverlay').classList.remove('open');}
+function guardarTarea(){
+  const titulo=document.getElementById('fTitulo').value.trim();
+  if(!titulo){alert('El título es obligatorio');return;}
+  const t={
+    id:editIdx!==null?tareasDinamicas[editIdx].id:Date.now(),
+    titulo, desc:document.getElementById('fDesc').value,
+    cliente:document.getElementById('fCliente').value,
+    cat:document.getElementById('fCat').value,
+    prio:document.getElementById('fPrio').value,
+    resp:document.getElementById('fResp2').value,
+    fecha:document.getElementById('fFecha').value,
+    recordatorio:document.getElementById('fRecordatorio').value,
+    creadaEn:editIdx!==null?tareasDinamicas[editIdx].creadaEn:new Date().toISOString(),
+    ultimaMod:new Date().toISOString(),
+    cerrada:editIdx!==null?tareasDinamicas[editIdx].cerrada:false,
+  };
+  if(editIdx!==null) tareasDinamicas[editIdx]=t;
+  else tareasDinamicas.unshift(t);
+  saveTareas(); cerrarModal(); renderTareas();
+}
+
+// ─── TAREAS ───────────────────────────────────────────────────────────────────
+function getEstadoT(t){
+  if(t.cerrada) return 'cerrada';
+  if(!t.fecha) return 'abierta';
+  const d=diffDays(t.fecha);
+  if(d<0) return 'vencida'; if(d<=3) return 'urgente'; return 'abierta';
+}
+function renderTareas(){
+  const fR=document.getElementById('ftResp').value;
+  const fP=document.getElementById('ftPrio').value;
+  const fC=document.getElementById('ftCat').value;
+  const fE=document.getElementById('ftEst').value;
+  const filtered=tareasDinamicas.filter(t=>{
+    if(fR&&t.resp!==fR) return false;
+    if(fP&&t.prio!==fP) return false;
+    if(fC&&t.cat!==fC) return false;
+    if(fE&&getEstadoT(t)!==fE) return false;
+    return true;
+  });
+  const total=tareasDinamicas.length;
+  const abiertas=tareasDinamicas.filter(t=>!t.cerrada).length;
+  const venc=tareasDinamicas.filter(t=>!t.cerrada&&t.fecha&&diffDays(t.fecha)<0).length;
+  const urg=tareasDinamicas.filter(t=>!t.cerrada&&t.fecha&&diffDays(t.fecha)>=0&&diffDays(t.fecha)<=3).length;
+  const diasInactivo=7;
+  const estancadas=tareasDinamicas.filter(t=>{
+    if(t.cerrada) return false;
+    const d=(Date.now()-new Date(t.ultimaMod))/86400000;
+    return d>=diasInactivo;
+  }).length;
+
+  document.getElementById('kpiTareas').innerHTML=`
+    <div class="kpi-card c-blue"><div class="kpi-label">Total tareas</div><div class="kpi-val">${total}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Abiertas</div><div class="kpi-val" style="color:var(--text)">${abiertas}</div></div>
+    <div class="kpi-card ${venc>0?'c-red':''}"><div class="kpi-label">Vencidas</div><div class="kpi-val">${venc}</div></div>
+    <div class="kpi-card ${urg>0?'c-yellow':''}"><div class="kpi-label">Urgentes</div><div class="kpi-val">${urg}</div></div>
+    <div class="kpi-card ${estancadas>0?'c-yellow':''}"><div class="kpi-label">Sin mover +7d</div><div class="kpi-val">${estancadas}</div></div>
+  `;
+
+  let aHtml='';
+  if(venc>0) aHtml+=`<div class="alerta red"><div class="alerta-dot"></div><strong>${venc} tarea${venc>1?'s':''} vencida${venc>1?'s':''}</strong> — fecha crítica superada</div>`;
+  if(urg>0) aHtml+=`<div class="alerta yellow"><div class="alerta-dot"></div><strong>${urg} tarea${urg>1?'s':''} urgente${urg>1?'s':''}</strong> — fecha crítica en ≤ 3 días</div>`;
+  if(estancadas>0) aHtml+=`<div class="alerta blue"><div class="alerta-dot"></div><strong>${estancadas} tarea${estancadas>1?'s':''} sin movimiento</strong> — más de ${diasInactivo} días sin actualizar</div>`;
+  if(!aHtml&&abiertas===0) aHtml=`<div class="alerta green"><div class="alerta-dot"></div>No hay tareas abiertas. ¡Todo cerrado!</div>`;
+  document.getElementById('alertasTareas').innerHTML=aHtml;
+  document.getElementById('tareasCount').textContent=`${filtered.length} tareas`;
+
+  const prioColors={Alta:'var(--red)',Media:'var(--yellow)',Baja:'var(--text3)'};
+  const estColors={vencida:'vencida-card',urgente:'urgente-card',cerrada:'done-card',abierta:''};
+  const bEstado={cerrada:'<span class="badge b-hecho">Cerrada</span>',vencida:'<span class="badge b-vencido">Vencida</span>',urgente:'<span class="badge b-urgente">Urgente</span>',abierta:'<span class="badge b-pendiente">Abierta</span>'};
+  
+  document.getElementById('tareasGrid').innerHTML=filtered.length===0
+    ?`<div style="text-align:center;padding:40px;color:var(--text3)">No hay tareas con los filtros seleccionados</div>`
+    :filtered.map((t,i)=>{
+      const idx=tareasDinamicas.indexOf(t);
+      const est=getEstadoT(t);
+      const diasCreada=Math.round((Date.now()-new Date(t.creadaEn))/86400000);
+      const fechaLabel=t.fecha?`<span style="font-family:'DM Mono',monospace;font-size:11px;color:${est==='vencida'?'var(--red)':est==='urgente'?'var(--yellow)':'var(--text3)'}">${t.fecha}</span>`:'';
+      return `<div class="tarea-card ${estColors[est]||''}">
+        <button class="chk${t.cerrada?' done':''}" onclick="toggleTarea(${idx})" title="Cerrar tarea">${t.cerrada?'✓':''}</button>
+        <div class="tarea-body">
+          <div class="tarea-titulo">${t.titulo}</div>
+          ${t.desc?`<div class="tarea-desc">${t.desc}</div>`:''}
+          <div class="tarea-meta">
+            <span class="badge b-cat">${t.cat}</span>
+            <span class="badge" style="background:transparent;color:${prioColors[t.prio]};font-size:11px">● ${t.prio}</span>
+            <span class="badge b-pendiente ${respClass(t.resp)}">${t.resp}</span>
+            ${t.cliente?`<span style="font-size:11px;color:var(--text3)">${t.cliente}</span>`:''}
+            ${fechaLabel}
+            ${bEstado[est]}
+            <span style="font-size:11px;color:var(--text3)">Hace ${diasCreada}d</span>
+          </div>
+        </div>
+        <div class="tarea-actions">
+          <button class="tarea-del" onclick="abrirModal(${idx})" title="Editar">✎</button>
+          <button class="tarea-del" onclick="eliminarTarea(${idx})" title="Eliminar">✕</button>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function toggleTarea(idx){
+  tareasDinamicas[idx].cerrada=!tareasDinamicas[idx].cerrada;
+  tareasDinamicas[idx].ultimaMod=new Date().toISOString();
+  saveTareas(); renderTareas();
+}
+function eliminarTarea(idx){
+  if(confirm('¿Eliminás esta tarea?')){tareasDinamicas.splice(idx,1);saveTareas();renderTareas();}
+}
+
+// ─── CONTROL ─────────────────────────────────────────────────────────────────
+function renderControl(){
+  const mes=document.getElementById('mesSelect').value;
+  const tareas=genTareas(mes);
+  const total=tareas.length;
+  const hechas=tareas.filter(t=>doneState[t.key]).length;
+  const venc=tareas.filter(t=>!doneState[t.key]&&diffDaysDMY(t.vto)<0).length;
+  const pct=total?Math.round(hechas/total*100):0;
+  const tareasAbiertas=tareasDinamicas.filter(t=>!t.cerrada).length;
+
+  document.getElementById('kpiControl').innerHTML=`
+    <div class="kpi-card c-green"><div class="kpi-label">Completado ${mes}</div><div class="kpi-val">${pct}%</div><div class="kpi-sub">${hechas}/${total}</div></div>
+    <div class="kpi-card ${venc>0?'c-red':''}"><div class="kpi-label">Vencidos ${mes}</div><div class="kpi-val">${venc}</div></div>
+    <div class="kpi-card c-blue"><div class="kpi-label">Tareas abiertas</div><div class="kpi-val">${tareasAbiertas}</div></div>
+    <div class="kpi-card"><div class="kpi-label">Clientes activos</div><div class="kpi-val" style="color:var(--text)">${CL.length}</div></div>
+  `;
+
+  // Ranking
+  const resps=['Mahsen','Emme','Nabil','Emme'];
+  const colors={Mahsen:'#4f7ef8',Emme:'#a855f7',Nabil:'#22c55e',Emme:'#f59e0b'};
+  const ranking=resps.map(r=>{
+    const rt=tareas.filter(t=>t.resp===r).length;
+    const rd=tareas.filter(t=>t.resp===r&&doneState[t.key]).length;
+    const tAbiertas=tareasDinamicas.filter(t=>!t.cerrada&&t.resp===r).length;
+    return {r,rt,rd,tAbiertas,pct:rt?Math.round(rd/rt*100):0};
+  }).filter(x=>x.rt>0).sort((a,b)=>b.pct-a.pct);
+
+  document.getElementById('rankingResp').innerHTML=ranking.map((x,i)=>`
+    <div class="ranking-row">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);width:16px">${i+1}</span>
+        <span style="font-weight:500;color:${colors[x.r]}">${x.r}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:11px;color:var(--text3)">${x.rd}/${x.rt} venc.</span>
+        <span style="font-size:11px;color:var(--yellow)">${x.tAbiertas} tareas</span>
+        <span style="font-family:'DM Mono',monospace;font-weight:500;color:${x.pct>=80?'var(--green)':x.pct>=50?'var(--yellow)':'var(--red)'}">${x.pct}%</span>
+      </div>
+    </div>`).join('');
+
+  // Tareas estancadas
+  const dias7=tareasDinamicas.filter(t=>{
+    if(t.cerrada) return false;
+    return (Date.now()-new Date(t.ultimaMod))/86400000>=7;
+  });
+  document.getElementById('tareasEstancadas').innerHTML=dias7.length===0
+    ?`<div style="color:var(--green);font-size:13px;padding:8px 0">Ninguna tarea lleva más de 7 días sin movimiento.</div>`
+    :dias7.map(t=>{
+      const dias=Math.round((Date.now()-new Date(t.ultimaMod))/86400000);
+      return `<div class="ranking-row">
+        <div>
+          <div style="font-size:12px;font-weight:500">${t.titulo}</div>
+          <div style="font-size:11px;color:var(--text3)">${t.resp} · ${t.cat}</div>
+        </div>
+        <span style="font-family:'DM Mono',monospace;font-size:12px;color:var(--red)">${dias}d</span>
+      </div>`;
+    }).join('');
+
+  // Gráfico anual
+  const mesesAll=['Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const hechasPorMes=mesesAll.map(m=>{
+    const t=genTareas(m);
+    return t.filter(x=>doneState[x.key]).length;
+  });
+  const totalPorMes=mesesAll.map(m=>genTareas(m).length);
+  if(anualChartInst){anualChartInst.destroy();anualChartInst=null;}
+  anualChartInst=new Chart(document.getElementById('chartAnual').getContext('2d'),{
+    type:'bar',
+    data:{
+      labels:mesesAll.map(m=>m.slice(0,3)),
+      datasets:[
+        {label:'Total',data:totalPorMes,backgroundColor:'rgba(79,126,248,0.15)',borderColor:'rgba(79,126,248,0.4)',borderWidth:1},
+        {label:'Completadas',data:hechasPorMes,backgroundColor:'rgba(34,197,94,0.5)',borderColor:'#22c55e',borderWidth:1}
+      ]
+    },
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8b91a8',font:{size:11},boxWidth:10}}},scales:{x:{ticks:{color:'#555e78'},grid:{color:'rgba(255,255,255,0.04)'}},y:{ticks:{color:'#555e78'},grid:{color:'rgba(255,255,255,0.04)'}}}}
+  });
+}
+
+// Init
+const mesActual=['Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const hoyMes=TODAY.getMonth()+1;
+const mesIdx=mesActual.findIndex(m=>{const n=MESES_N[m];return hoyMes<=n;});
+if(mesIdx>=0) document.getElementById('mesSelect').value=mesActual[mesIdx];
+document.getElementById('modalOverlay').addEventListener('click',e=>{if(e.target===document.getElementById('modalOverlay'))cerrarModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')cerrarModal();});
+renderVencimientos();
+</script>
+</body>
+</html>
